@@ -1,12 +1,30 @@
 <script setup>
 // This starter template is using Vue 3 <script setup> SFCs
 // Check out https://vuejs.org/api/sfc-script-setup.html#script-setup
-import HelloWorld from './components/HelloWorld.vue'
+import StudentForm from "./components/StudentForm.vue";
 </script>
 
 <template>
-  <img alt="Vue logo" src="./assets/logo.png" />
-  <HelloWorld msg="Hello Vue 3 + Vite" />
+    <q-layout view="hHh lpR fFf">
+        <q-page-container>
+            <q-page padding>
+                <div class="row">
+                    <StudentForm class="col-12 col-sm-6" />
+                </div>
+            </q-page>
+        </q-page-container>
+
+        <q-footer
+            elevated
+            class="bg-grey-8 text-white"
+        >
+            <q-toolbar>
+                <q-toolbar-title>
+                    <div>Title</div>
+                </q-toolbar-title>
+            </q-toolbar>
+        </q-footer>
+    </q-layout>
 </template>
 
 <style>
