@@ -8,11 +8,20 @@ export default defineConfig({
     })],
     publicDir: "../assets",
     build: {
+        lib: {
+            entry: "src/main.js",
+            name: "mylib",
+            fileName: () => "main.js"
+        },
         rollupOptions: {
+            external: ["vue"],
             output: {
                 dir: "../assets",
                 assetFileNames: "[name][extname]",
                 entryFileNames: "main.js",
+                globals: {
+                    vue: "Vue"
+                },
             },
         },
     },

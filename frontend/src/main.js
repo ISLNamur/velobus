@@ -11,6 +11,8 @@ const myApp = createApp(App);
 
 myApp.use(Quasar, {
     plugins: {}, // import Quasar plugins and add here
+    extras: [
+    ]
 });
 
 myApp.mount("#app");
