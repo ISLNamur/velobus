@@ -8,6 +8,9 @@ class TrackModel(models.Model):
     color = models.CharField(max_length=10)
     track_coordinates = models.JSONField()
 
+    def __str__(self):
+        return self.name
+
 
 class StopModel(models.Model):
     name = models.CharField(max_length=200)
@@ -49,7 +52,9 @@ class PersonModel(models.Model):
 
 
 class ResponsibleModel(PersonModel):
-    track = models.ForeignKey(TrackModel, on_delete=models.SET_NULL, null=True, blank=True)
+    track = models.ForeignKey(
+        TrackModel, on_delete=models.SET_NULL, null=True, blank=True
+    )
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
 

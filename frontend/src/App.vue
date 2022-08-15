@@ -1,6 +1,4 @@
 <script setup>
-// This starter template is using Vue 3 <script setup> SFCs
-// Check out https://vuejs.org/api/sfc-script-setup.html#script-setup
 import StudentForm from "./components/StudentForm.vue";
 import TrackMap from "./components/TrackMap.vue";
 </script>
@@ -17,7 +15,10 @@ import TrackMap from "./components/TrackMap.vue";
             </q-page>
         </q-page-container>
 
-        <q-footer elevated class="bg-grey-8 text-white">
+        <q-footer
+            elevated
+            class="bg-grey-8 text-white"
+        >
             <q-toolbar>
                 <q-toolbar-title>
                     <div>Title</div>
