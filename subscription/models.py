@@ -18,16 +18,22 @@ class StopModel(models.Model):
     time_morning = models.TimeField()
     time_afternoon = models.TimeField()
     place = models.CharField(max_length=500)
-    picture = models.ImageField(upload_to="places")
+    picture = models.ImageField(upload_to="places", blank=True, null=True)
     coordinates = models.JSONField()
 
 
 class SchoolModel(models.Model):
     name = models.CharField(max_length=100)
 
+    def __str__(self):
+        return self.name
+
 
 class AvailableDateModel(models.Model):
     date = models.DateField()
+
+    def __str__(self):
+        return str(self.date)
 
 
 class DateSubscriptionModel(models.Model):
