@@ -10,11 +10,13 @@ import { useMapStore } from "./stores/map";
 const mapStore = useMapStore();
 mapStore.getData();
 
-const studentForm = ref(null);
+let updateTrack = () => {};
+function getTrackInterface(updateFunction) {
+    updateTrack = updateFunction.setTrack;
+}
 
 function updateTrackSelection(trackId) {
-    // console.log($refs.studentForm);
-    // studentForm.value.formData.tracks = mapStore.tracks.find((t) => t.id === trackId);
+    updateTrack(trackId);
 }
 
 </script>
@@ -30,8 +32,8 @@ function updateTrackSelection(trackId) {
                         @track-selected="updateTrackSelection"
                     />
                     <router-view
-                        ref="studentForm"
                         class="col-12 col-sm-6"
+                        @exposeTrack="getTrackInterface"
                     />
                 </div>
             </q-page>

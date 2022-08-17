@@ -1,6 +1,6 @@
 <script setup>
 import {
-    onBeforeMount, reactive, ref, watch,
+    onBeforeMount, reactive, ref, watch, defineEmits,
 } from "vue";
 import axios from "axios";
 
@@ -18,6 +18,8 @@ const props = defineProps({
         default: 1,
     },
 });
+
+const emit = defineEmits(["exposeTrack"]);
 
 const formData = reactive({
     tracks: null,
@@ -50,6 +52,12 @@ onBeforeMount(() => {
         .then((resp) => {
             availableDates.value = resp.data;
         });
+
+    emit("exposeTrack", {
+        setTrack: (trackId) => {
+            formData.tracks = mapStore.tracks.find((t) => t.id === trackId);
+        },
+    });
 });
 
 function selectTrackFromStop(event) {
