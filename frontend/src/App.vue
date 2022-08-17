@@ -1,6 +1,22 @@
 <script setup>
+import axios from "axios";
+
+import { ref, toRaw } from "vue";
 import StudentForm from "./components/StudentForm.vue";
 import TrackMap from "./components/TrackMap.vue";
+
+import { useMapStore } from "./stores/map";
+
+const mapStore = useMapStore();
+mapStore.getData();
+
+const studentForm = ref(null);
+
+function updateTrackSelection(trackId) {
+    // console.log($refs.studentForm);
+    // studentForm.value.formData.tracks = mapStore.tracks.find((t) => t.id === trackId);
+}
+
 </script>
 
 <template>
@@ -9,8 +25,14 @@ import TrackMap from "./components/TrackMap.vue";
             <q-page padding>
                 <h1>Vélobus</h1>
                 <div class="row">
-                    <TrackMap class="col-12 col-sm-6" />
-                    <StudentForm class="col-12 col-sm-6" />
+                    <TrackMap
+                        class="col-12 col-sm-6"
+                        @track-selected="updateTrackSelection"
+                    />
+                    <router-view
+                        ref="studentForm"
+                        class="col-12 col-sm-6"
+                    />
                 </div>
             </q-page>
         </q-page-container>
@@ -37,4 +59,5 @@ import TrackMap from "./components/TrackMap.vue";
     color: #2c3e50;
     margin-top: 60px;
 }
+
 </style>
