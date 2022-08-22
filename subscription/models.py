@@ -1,3 +1,4 @@
+import uuid
 from django.db import models
 from django.contrib.auth.models import User
 
@@ -37,8 +38,8 @@ class AvailableDateModel(models.Model):
 
 class DateSubscriptionModel(models.Model):
     subscription_date = models.ForeignKey(AvailableDateModel, on_delete=models.CASCADE)
-    morning = models.BooleanField()
-    afternoon = models.BooleanField()
+    morning = models.BooleanField(default=False)
+    afternoon = models.BooleanField(default=False)
     comment = models.TextField(blank=True)
     datetime_creation = models.DateTimeField(auto_now_add=True)
     datetime_modification = models.DateTimeField(auto_now=True)
@@ -64,7 +65,7 @@ class ResponsibleModel(PersonModel):
 
 
 class StudentModel(PersonModel):
-    uuid = models.UUIDField(primary_key=True)
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     street = models.CharField(max_length=100)
     postal_code = models.CharField(max_length=10)
     locality = models.CharField(max_length=40)
