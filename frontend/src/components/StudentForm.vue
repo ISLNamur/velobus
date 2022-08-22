@@ -6,6 +6,8 @@ import axios from "axios";
 
 import { useMapStore } from "../stores/map";
 
+const token = { xsrfCookieName: "csrftoken", xsrfHeaderName: "X-CSRFToken" };
+
 const mapStore = useMapStore();
 
 const props = defineProps({
@@ -26,7 +28,6 @@ const formData = reactive({
     stops: null,
     last_name: "",
     first_name: "",
-    uuid: "",
     school: "",
     classe: "",
     street: "",
@@ -43,14 +44,59 @@ const schoolOptions = ref([]);
 const availableDates = ref([]);
 const dates = ref([]);
 
+function selectTrackFromStop(event) {
+    formData.tracks = mapStore.tracks.find((t) => t.id === event.track);
+}
+
+function submitData(person) {
+    const dateSubscriptions = [];
+    dates.value.forEach((d) => {
+        const splitValue = d.split("_");
+        const availDateId = parseInt(splitValue[0], 10);
+        const existingDate = dateSubscriptions.find((dS) => dS.subscription_date === availDateId);
+        if (existingDate) {
+            existingDate[splitValue[1]] = true;
+        } else {
+            const newDate = { subscription_date: availDateId, comment: "" };
+            if (splitValue[2] !== "") {
+                newDate.id = parseInt(splitValue[2], 10);
+            }
+            newDate[splitValue[1]] = true;
+            dateSubscriptions.push(newDate);
+        }
+    });
+
+    console.log(dateSubscriptions);
+
+    const putSub = dateSubscriptions.filter((dS) => "id" in dS)
+        .map((dS) => axios.put(`/subscription/api/date_subscription/${dS.id}/`, dS, token));
+    const postSub = dateSubscriptions.filter((dS) => !("id" in dS))
+        .map((dS) => axios.post("/subscription/api/date_subscription/", dS, token));
+    Promise.all(putSub.concat(postSub))
+        .then((resps) => {
+            const dateSubIds = resps.map((d) => d.data.id);
+            formData.subscription = dateSubIds;
+            const send = "uuid" in formData ? axios.put : axios.post;
+            send(`/subscription/api/${person}/${"uuid" in formData ? formData.uuid : ""}`, formData, token)
+                .then((resp) => {
+                    console.log(resp);
+                    return resp;
+                });
+            return resps;
+        });
+}
+
 onBeforeMount(() => {
     axios.get("/subscription/api/school/")
         .then((resp) => {
             schoolOptions.value = resp.data;
+            return resp;
         });
+    // TODO We should add date subscription id to availableDates entries when editing.
     axios.get("/subscription/api/available_date/")
         .then((resp) => {
             availableDates.value = resp.data;
+            return resp;
         });
 
     emit("exposeTrack", {
@@ -59,10 +105,6 @@ onBeforeMount(() => {
         },
     });
 });
-
-function selectTrackFromStop(event) {
-    formData.tracks = mapStore.tracks.find((t) => t.id === event.track);
-}
 
 watch(() => formData.tracks, (newVal) => {
     if (formData.stops && formData.stops.track !== newVal.id) {
@@ -220,12 +262,14 @@ watch(() => formData.tracks, (newVal) => {
                             <strong>{{ date.date }}</strong>
                             <q-checkbox
                                 v-model="dates"
-                                :val="`${date.date}-morning`"
+                                :val="`${date.id}_morning_${date.dateSubId ? date.dateSubId : ''}`"
                                 label="Aller (matin)"
                             />
                             <q-checkbox
                                 v-model="dates"
-                                :val="`${date.date}-afternoon`"
+                                :val="`${date.id}_afternoon_${
+                                    date.dateSubId ? date.dateSubId : ''
+                                }`"
                                 label="Retour (après-midi)"
                             />
                         </div>
@@ -254,7 +298,7 @@ watch(() => formData.tracks, (newVal) => {
                         <q-btn
                             color="positive"
                             label="Valider"
-                            @click=""
+                            @click="submitData('student')"
                         />
                         <q-btn
                             flat
