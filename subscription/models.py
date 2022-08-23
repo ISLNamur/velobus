@@ -52,16 +52,17 @@ class PersonModel(models.Model):
     school = models.ForeignKey(SchoolModel, on_delete=models.CASCADE)
     email = models.EmailField()
     subscription = models.ManyToManyField(DateSubscriptionModel, blank=True)
+    track = models.ForeignKey(
+        TrackModel, on_delete=models.SET_NULL, null=True, blank=True
+    )
 
     class Meta:
         abstract = True
 
 
 class ResponsibleModel(PersonModel):
-    track = models.ForeignKey(
-        TrackModel, on_delete=models.SET_NULL, null=True, blank=True
-    )
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    is_point_of_contact = models.BooleanField(default=False)
 
 
 class StudentModel(PersonModel):
@@ -70,3 +71,4 @@ class StudentModel(PersonModel):
     postal_code = models.CharField(max_length=10)
     locality = models.CharField(max_length=40)
     student_phone = models.CharField(max_length=20, blank=True)
+    stop = models.ForeignKey(StopModel, on_delete=models.SET_NULL, null=True)
