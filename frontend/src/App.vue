@@ -10,7 +10,9 @@ import { useMapStore } from "./stores/map";
 const mapStore = useMapStore();
 mapStore.getData();
 
-let updateTrack = () => {};
+const uuid = ref("");
+
+let updateTrack = () => { };
 function getTrackInterface(updateFunction) {
     updateTrack = updateFunction.setTrack;
 }
@@ -27,22 +29,14 @@ function updateTrackSelection(trackId) {
             <q-page padding>
                 <h1>Vélobus</h1>
                 <div class="row">
-                    <TrackMap
-                        class="col-12 col-sm-6"
-                        @track-selected="updateTrackSelection"
-                    />
-                    <router-view
-                        class="col-12 col-sm-6"
-                        @exposeTrack="getTrackInterface"
-                    />
+                    <TrackMap class="col-12 col-sm-6" @track-selected="updateTrackSelection" />
+                    <router-view class="col-12 col-sm-6" @exposeTrack="getTrackInterface" :uuid="uuid"
+                        @updateUuid="(data) => uuid = data" />
                 </div>
             </q-page>
         </q-page-container>
 
-        <q-footer
-            elevated
-            class="bg-grey-8 text-white"
-        >
+        <q-footer elevated class="bg-grey-8 text-white">
             <q-toolbar>
                 <q-toolbar-title>
                     <div>Title</div>
@@ -61,5 +55,4 @@ function updateTrackSelection(trackId) {
     color: #2c3e50;
     margin-top: 60px;
 }
-
 </style>

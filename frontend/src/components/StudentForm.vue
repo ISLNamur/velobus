@@ -40,6 +40,10 @@ const formData = reactive({
     email: "",
 });
 
+if (props.uuid) {
+    formData.uuid = props.uuid;
+}
+
 defineExpose({ formData });
 
 const schoolOptions = ref([]);
@@ -68,7 +72,7 @@ function changeStep(from, to) {
         return;
     }
 
-    router.push(`/studentform/${to}`);
+    router.push(`/student/${to}/${props.uuid}`);
 }
 
 function checkStep(step) {
@@ -156,8 +160,8 @@ function submitData(person) {
             const send = "uuid" in formData ? axios.put : axios.post;
             send(`/subscription/api/${person}/${"uuid" in formData ? formData.uuid : ""}`, data, token)
                 .then((resp) => {
-                    console.log(resp);
                     emit("updateUuid", resp.data.uuid);
+                    formData.uuid = resp.data.uuid;
                     return resp;
                 });
             return resps;
