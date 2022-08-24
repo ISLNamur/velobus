@@ -1,16 +1,11 @@
 <script setup>
-import axios from "axios";
-
-import { ref, toRaw } from "vue";
-import StudentForm from "./components/StudentForm.vue";
+import { ref } from "vue";
 import TrackMap from "./components/TrackMap.vue";
 
 import { useMapStore } from "./stores/map";
 
 const mapStore = useMapStore();
 mapStore.getData();
-
-const uuid = ref("");
 
 let updateTrack = () => { };
 function getTrackInterface(updateFunction) {
@@ -29,14 +24,22 @@ function updateTrackSelection(trackId) {
             <q-page padding>
                 <h1>Vélobus</h1>
                 <div class="row">
-                    <TrackMap class="col-12 col-sm-6" @track-selected="updateTrackSelection" />
-                    <router-view class="col-12 col-sm-6" @exposeTrack="getTrackInterface" :uuid="uuid"
-                        @updateUuid="(data) => uuid = data" />
+                    <TrackMap
+                        class="col-12 col-sm-6"
+                        @track-selected="updateTrackSelection"
+                    />
+                    <router-view
+                        class="col-12 col-sm-6"
+                        @expose-track="getTrackInterface"
+                    />
                 </div>
             </q-page>
         </q-page-container>
 
-        <q-footer elevated class="bg-grey-8 text-white">
+        <q-footer
+            elevated
+            class="bg-grey-8 text-white"
+        >
             <q-toolbar>
                 <q-toolbar-title>
                     <div>Title</div>

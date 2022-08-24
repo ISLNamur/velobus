@@ -48,6 +48,7 @@ class DateSubscriptionModel(models.Model):
 class PersonModel(models.Model):
     last_name = models.CharField(max_length=100)
     first_name = models.CharField(max_length=100)
+    classe = models.CharField(max_length=20)
     phone_number = models.CharField(max_length=20, blank=True)
     school = models.ForeignKey(SchoolModel, on_delete=models.CASCADE)
     email = models.EmailField()
