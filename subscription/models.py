@@ -46,6 +46,7 @@ class DateSubscriptionModel(models.Model):
 
 
 class PersonModel(models.Model):
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     last_name = models.CharField(max_length=100)
     first_name = models.CharField(max_length=100)
     classe = models.CharField(max_length=20)
@@ -67,7 +68,6 @@ class ResponsibleModel(PersonModel):
 
 
 class StudentModel(PersonModel):
-    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     street = models.CharField(max_length=100)
     postal_code = models.CharField(max_length=10)
     locality = models.CharField(max_length=40)
