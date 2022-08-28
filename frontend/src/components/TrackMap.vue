@@ -12,9 +12,9 @@ const mapOsm = ref({});
 
 onMounted(() => {
     mapOsm.value = L.map("mapid").setView([50.4658, 4.8671], 12);
-    const osm = L.tileLayer("http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    const osm = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         maxZoom: 19,
-        attribution: "&copy; <a href=\"http://www.openstreetmap.org/copyright\">OpenStreetMap</a>",
+        attribution: "&copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a>",
     });
 
     osm.addTo(mapOsm.value);
