@@ -9,11 +9,15 @@ load_dotenv()
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-SECRET_KEY = "9ng(s5x7fde7=vhns6ro$n(r1lbm5ey&h4+ap)&xnf879bc$6t"
+SECRET_KEY = os.environ.get(
+    "DJANGO_SECRET_KEY", "9ng(s5x7fde7=vhns6ro$n(r1lbm5ey&h4+ap)&xnf879bc$6t"
+)
 
 DEBUG = os.environ.get("DJANGO_DEBUG", "True") == "True"
 
 ALLOWED_HOSTS = []
+if os.environ.get("DJANGO_HOST", False):
+    ALLOWED_HOSTS.append(os.environ.get("DJANGO_HOST"))
 
 # Application definition
 
