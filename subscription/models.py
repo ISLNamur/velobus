@@ -49,7 +49,6 @@ class PersonModel(models.Model):
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     last_name = models.CharField(max_length=100)
     first_name = models.CharField(max_length=100)
-    classe = models.CharField(max_length=20)
     phone_number = models.CharField(max_length=20, blank=True)
     school = models.ForeignKey(SchoolModel, on_delete=models.CASCADE)
     email = models.EmailField()
@@ -63,11 +62,12 @@ class PersonModel(models.Model):
 
 
 class ResponsibleModel(PersonModel):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     is_point_of_contact = models.BooleanField(default=False)
 
 
 class StudentModel(PersonModel):
+    classe = models.CharField(max_length=20)
     street = models.CharField(max_length=100)
     postal_code = models.CharField(max_length=10)
     locality = models.CharField(max_length=40)
