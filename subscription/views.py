@@ -23,6 +23,7 @@ def send_welcome_mail(person: str, uuid: str, recipient: str) -> int:
     return send_mail(
         subject=subject,
         message=raw_message,
+        from_email=None,
         recipient_list=[recipient],
         fail_silently=True,
         html_message=html_message,
