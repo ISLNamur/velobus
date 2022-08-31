@@ -46,6 +46,7 @@ if (props.uuid) {
 
 defineExpose({ formData });
 
+const loading = ref(false);
 const schoolOptions = ref([]);
 const availableDates = ref([]);
 const dates = ref([]);
@@ -133,6 +134,7 @@ function submitData(person) {
     if (!acceptPolicy.value) {
         return;
     }
+    loading.value = true;
     const dateSubscriptions = [];
     dates.value.forEach((d) => {
         const splitValue = d.split("_");
@@ -174,8 +176,18 @@ function submitData(person) {
                     formData.uuid = resp.data.uuid;
                     successModal.value.show();
                     return resp;
+                })
+                .catch(() => {
+                    // eslint-disable-next-line no-alert
+                    alert("Une erreur s'est produite pendant l'envoi des données, merci de réessayer.");
+                    loading.value = false;
                 });
             return resps;
+        })
+        .catch(() => {
+            // eslint-disable-next-line no-alert
+            alert("Une erreur s'est produite pendant l'envoi des données, merci de réessayer.");
+            loading.value = false;
         });
 }
 
@@ -265,7 +277,10 @@ watch(() => formData.track, (newVal) => {
 
                 <q-card-section class="q-pt-none">
                     Les données ont été envoyées avec succes !
-                    Un courriel de confirmation reprenant les données de l'inscription a été envoyé.
+                    <span v-if="!$route.params.uuid">
+                        Un courriel de confirmation reprenant les données
+                        de l'inscription a été envoyé.
+                    </span>
                 </q-card-section>
 
                 <q-card-actions align="right">
@@ -500,6 +515,7 @@ watch(() => formData.track, (newVal) => {
                             color="positive"
                             label="Valider"
                             :disable="!acceptPolicy"
+                            :loading="loading"
                             @click="submitData('student')"
                         />
                         <q-btn

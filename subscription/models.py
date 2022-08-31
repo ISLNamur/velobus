@@ -21,6 +21,9 @@ class StopModel(models.Model):
     picture = models.ImageField(upload_to="places", blank=True, null=True)
     coordinates = models.JSONField()
 
+    def __str__(self):
+        return f"{self.name} ({self.track})"
+
 
 class SchoolModel(models.Model):
     name = models.CharField(max_length=100)
@@ -56,6 +59,10 @@ class PersonModel(models.Model):
     track = models.ForeignKey(
         TrackModel, on_delete=models.SET_NULL, null=True, blank=True
     )
+    stop = models.ForeignKey(StopModel, on_delete=models.SET_NULL, null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.last_name} {self.first_name}"
 
     class Meta:
         abstract = True

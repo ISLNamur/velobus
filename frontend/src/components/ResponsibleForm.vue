@@ -41,6 +41,7 @@ if (props.uuid) {
 
 defineExpose({ formData });
 
+const loading = ref(false);
 const schoolOptions = ref([]);
 const availableDates = ref([]);
 const dates = ref([]);
@@ -60,39 +61,41 @@ function selectTrackFromStop(event) {
 
 function checkStep(step) {
     switch (step) {
-        case 1:
-            if (!trackForm.value.validate() || !stopForm.value.validate()) {
-                return false;
-            }
-            trackForm.value.resetValidation();
-            stopForm.value.resetValidation();
-            return true;
+    case 1:
+        if (!trackForm.value.validate() || !stopForm.value.validate()) {
+            return false;
+        }
+        trackForm.value.resetValidation();
+        stopForm.value.resetValidation();
+        return true;
 
-        case 2:
-            if (
-                !lastNameForm.value.validate() || !firstNameForm.value.validate() || !schoolForm.value.validate()
-            ) {
-                return false;
-            }
-            lastNameForm.value.resetValidation();
-            firstNameForm.value.resetValidation();
-            return true;
+    case 2:
+        if (
+            !lastNameForm.value.validate()
+            || !firstNameForm.value.validate()
+            || !schoolForm.value.validate()
+        ) {
+            return false;
+        }
+        lastNameForm.value.resetValidation();
+        firstNameForm.value.resetValidation();
+        return true;
 
-        case 3:
-            if (!phoneNumberForm.value.validate() || !emailForm.value.validate()
-            ) {
-                return false;
-            }
-            phoneNumberForm.value.resetValidation();
-            emailForm.value.resetValidation();
-            return true;
+    case 3:
+        if (!phoneNumberForm.value.validate() || !emailForm.value.validate()
+        ) {
+            return false;
+        }
+        phoneNumberForm.value.resetValidation();
+        emailForm.value.resetValidation();
+        return true;
 
-        case 4:
-            return true;
-        case 5:
-            return true;
-        default:
-            return true;
+    case 4:
+        return true;
+    case 5:
+        return true;
+    default:
+        return true;
     }
 }
 
@@ -108,6 +111,7 @@ function submitData(person) {
     if (!acceptPolicy.value) {
         return;
     }
+    loading.value = true;
     const dateSubscriptions = [];
     dates.value.forEach((d) => {
         const splitValue = d.split("_");
@@ -143,19 +147,30 @@ function submitData(person) {
                 );
                 availDate.dateSubId = dS.data.id;
             });
-            const send = "id" in formData ? axios.put : axios.post;
+            const send = "uuid" in formData ? axios.put : axios.post;
             send(`/subscription/api/${person}/${"uuid" in formData ? `${formData.uuid}/` : ""}`, data, token)
                 .then((resp) => {
                     formData.uuid = resp.data.uuid;
                     successModal.value.show();
+                    loading.value = false;
                     return resp;
+                })
+                .catch(() => {
+                    // eslint-disable-next-line no-alert
+                    alert("Une erreur s'est produite pendant l'envoi des données, merci de réessayer.");
+                    loading.value = false;
                 });
             return resps;
+        })
+        .catch(() => {
+            // eslint-disable-next-line no-alert
+            alert("Une erreur s'est produite pendant l'envoi des données, merci de réessayer.");
+            loading.value = false;
         });
 }
 
 function reloadPage() {
-    router.push("/")
+    router.push("/responsible/1")
         .then(() => {
             window.location.reload();
         });
@@ -172,6 +187,7 @@ onBeforeMount(() => {
         if (props.uuid) {
             axios.get(`/subscription/api/responsible/${props.uuid}`)
                 .then((resp) => {
+                    mapStore.getData();
                     formData.track = mapStore.tracks.find((t) => t.id === resp.data.track);
                     formData.stop = mapStore.stops.find((s) => s.id === resp.data.stop);
                     formData.last_name = resp.data.last_name;
@@ -219,7 +235,13 @@ watch(() => formData.track, (newVal) => {
 
 <template>
     <div>
-        <q-dialog ref="successModal" persistent transition-show="scale" transition-hide="scale" @hide="reloadPage">
+        <q-dialog
+            ref="successModal"
+            persistent
+            transition-show="scale"
+            transition-hide="scale"
+            @hide="reloadPage"
+        >
             <q-card>
                 <q-card-section>
                     <div class="text-h6">
@@ -229,88 +251,218 @@ watch(() => formData.track, (newVal) => {
 
                 <q-card-section class="q-pt-none">
                     Les données ont été envoyées avec succes !
-                    Un courriel de confirmation reprenant les données de l'inscription a été envoyé.
+                    <span v-if="!$route.params.uuid">
+                        Un courriel de confirmation reprenant les données
+                        de l'inscription a été envoyé.
+                    </span>
                 </q-card-section>
 
                 <q-card-actions align="right">
-                    <q-btn v-close-popup flat label="OK" color="primary" />
+                    <q-btn
+                        v-close-popup
+                        flat
+                        label="OK"
+                        color="primary"
+                    />
                 </q-card-actions>
             </q-card>
         </q-dialog>
         <q-form>
-            <q-stepper v-model="step" vertical color="primary" animated>
-                <q-step :name="1" title="Lieu de rencontre" :done="step > 1">
-                    <q-select ref="trackForm" v-model="formData.track" :options="mapStore.tracks" option-value="id"
-                        option-label="name" label="Choix du tracé"
-                        :rules="[val => !!val || 'Vous devez choisir un tracé.']" />
-                    <q-select ref="stopForm" v-model="formData.stop" :options="mapStore.stops" option-value="id"
-                        option-label="name" label="Point de départ"
+            <q-stepper
+                v-model="step"
+                vertical
+                color="primary"
+                animated
+            >
+                <q-step
+                    :name="1"
+                    title="Lieu de rencontre"
+                    :done="step > 1"
+                >
+                    <q-select
+                        ref="trackForm"
+                        v-model="formData.track"
+                        :options="mapStore.tracks"
+                        option-value="id"
+                        option-label="name"
+                        label="Choix du tracé"
+                        :rules="[val => !!val || 'Vous devez choisir un tracé.']"
+                    />
+                    <q-select
+                        ref="stopForm"
+                        v-model="formData.stop"
+                        :options="mapStore.stops"
+                        option-value="id"
+                        option-label="name"
+                        label="Point de départ"
                         :rules="[val => !!val || 'Vous devez choisir un arrêt.']"
-                        @update:model-value="selectTrackFromStop" />
+                        @update:model-value="selectTrackFromStop"
+                    />
                     <q-stepper-navigation>
-                        <q-btn color="primary" label="Continuer" @click="changeStep(1, 2)" />
+                        <q-btn
+                            color="primary"
+                            label="Continuer"
+                            @click="changeStep(1, 2)"
+                        />
                     </q-stepper-navigation>
                 </q-step>
 
-                <q-step :name="2" title="Identité" :done="step > 2">
-                    <q-input ref="lastNameForm" v-model="formData.last_name" label="Nom"
-                        :rules="[val => val.trim().length > 0 || 'Ce champ est nécessaire.']" />
-                    <q-input ref="firstNameForm" v-model="formData.first_name" label="Prénom"
-                        :rules="[val => val.trim().length > 0 || 'Ce champ est nécessaire.']" />
-                    <q-select ref="schoolForm" v-model="formData.school" :options="schoolOptions" option-label="name"
-                        option-value="id" label="École" :rules="[val => !!val || 'Vous devez choisir une école']" />
+                <q-step
+                    :name="2"
+                    title="Identité"
+                    :done="step > 2"
+                >
+                    <q-input
+                        ref="lastNameForm"
+                        v-model="formData.last_name"
+                        label="Nom"
+                        :rules="[val => val.trim().length > 0 || 'Ce champ est nécessaire.']"
+                    />
+                    <q-input
+                        ref="firstNameForm"
+                        v-model="formData.first_name"
+                        label="Prénom"
+                        :rules="[val => val.trim().length > 0 || 'Ce champ est nécessaire.']"
+                    />
+                    <q-select
+                        ref="schoolForm"
+                        v-model="formData.school"
+                        :options="schoolOptions"
+                        option-label="name"
+                        option-value="id"
+                        label="École"
+                        :rules="[val => !!val || 'Vous devez choisir une école']"
+                    />
                     <q-stepper-navigation>
-                        <q-btn color="primary" label="Continuer" @click="changeStep(2, 3)" />
-                        <q-btn flat color="primary" label="Retour" class="q-ml-sm" @click="changeStep(2, 1)" />
+                        <q-btn
+                            color="primary"
+                            label="Continuer"
+                            @click="changeStep(2, 3)"
+                        />
+                        <q-btn
+                            flat
+                            color="primary"
+                            label="Retour"
+                            class="q-ml-sm"
+                            @click="changeStep(2, 1)"
+                        />
                     </q-stepper-navigation>
                 </q-step>
 
-                <q-step :name="3" title="Moyen de contact" :done="step > 3">
-                    <q-input ref="phoneNumberForm" v-model="formData.phone_number" label="GSM" type="tel"
-                        :rules="[val => val.trim().length > 0 || 'Ce champ est nécessaire.']">
+                <q-step
+                    :name="3"
+                    title="Moyen de contact"
+                    :done="step > 3"
+                >
+                    <q-input
+                        ref="phoneNumberForm"
+                        v-model="formData.phone_number"
+                        label="GSM"
+                        type="tel"
+                        :rules="[val => val.trim().length > 0 || 'Ce champ est nécessaire.']"
+                    >
                         <template #prepend>
                             <q-icon name="phone" />
                         </template>
                     </q-input>
-                    <q-input ref="emailForm" v-model="formData.email" label="Email de contact" type="email"
-                        :rules="['email' || 'Ce champ est nécessaire.']">
+                    <q-input
+                        ref="emailForm"
+                        v-model="formData.email"
+                        label="Email de contact"
+                        type="email"
+                        :rules="['email' || 'Ce champ est nécessaire.']"
+                    >
                         <template #prepend>
                             <q-icon name="email" />
                         </template>
                     </q-input>
                     <q-stepper-navigation>
-                        <q-btn color="primary" label="Continuer" @click="changeStep(3, 4)" />
-                        <q-btn flat color="primary" label="Retour" class="q-ml-sm" @click="changeStep(3, 2)" />
+                        <q-btn
+                            color="primary"
+                            label="Continuer"
+                            @click="changeStep(3, 4)"
+                        />
+                        <q-btn
+                            flat
+                            color="primary"
+                            label="Retour"
+                            class="q-ml-sm"
+                            @click="changeStep(3, 2)"
+                        />
                     </q-stepper-navigation>
                 </q-step>
-                <q-step :name="4" title="Dates des trajets" :done="step > 4">
+                <q-step
+                    :name="4"
+                    title="Dates des trajets"
+                    :done="step > 4"
+                >
                     <div class="q-pa-md">
-                        <div v-for="date in availableDates" :key="date" class="q-gutter-sm">
+                        <div
+                            v-for="date in availableDates"
+                            :key="date"
+                            class="q-gutter-sm"
+                        >
                             <strong>{{ date.date }}</strong>
-                            <q-checkbox v-model="dates"
+                            <q-checkbox
+                                v-model="dates"
                                 :val="`${date.id}_morning_${date.dateSubId ? date.dateSubId : ''}`"
-                                label="Aller (matin)" />
-                            <q-checkbox v-model="dates" :val="`${date.id}_afternoon_${date.dateSubId ? date.dateSubId : ''
-                            }`" label="Retour (après-midi)" />
+                                label="Aller (matin)"
+                            />
+                            <q-checkbox
+                                v-model="dates"
+                                :val="`${date.id}_afternoon_${date.dateSubId ? date.dateSubId : ''
+                                }`"
+                                label="Retour (après-midi)"
+                            />
                         </div>
                     </div>
                     <q-stepper-navigation>
-                        <q-btn color="primary" label="Continuer" @click="changeStep(4, 5)" />
-                        <q-btn flat color="primary" label="Retour" class="q-ml-sm" @click="changeStep(4, 3)" />
+                        <q-btn
+                            color="primary"
+                            label="Continuer"
+                            @click="changeStep(4, 5)"
+                        />
+                        <q-btn
+                            flat
+                            color="primary"
+                            label="Retour"
+                            class="q-ml-sm"
+                            @click="changeStep(4, 3)"
+                        />
                     </q-stepper-navigation>
                 </q-step>
-                <q-step :name="5" title="Confirmation" :done="step > 5">
+                <q-step
+                    :name="5"
+                    title="Confirmation"
+                    :done="step > 5"
+                >
                     <q-checkbox v-model="acceptPolicy">
                         <slot>
                             Je confirme avoir lu et approuvé la convention ci-dessous.
                         </slot>
                     </q-checkbox>
-                    <q-btn color="primary" icon="download" label="Télécharger la convention (pdf)"
-                        href="/static/convention.pdf" target="_blank" />
+                    <q-btn
+                        color="primary"
+                        icon="download"
+                        label="Télécharger la convention (pdf)"
+                        href="/static/convention.pdf"
+                        target="_blank"
+                    />
                     <q-stepper-navigation>
-                        <q-btn color="positive" label="Valider" :disable="!acceptPolicy"
-                            @click="submitData('responsible')" />
-                        <q-btn flat color="primary" label="Retour" class="q-ml-sm" @click="changeStep(5, 4)" />
+                        <q-btn
+                            color="positive"
+                            label="Valider"
+                            :disable="!acceptPolicy"
+                            :loading="loading"
+                            @click="submitData('responsible')"
+                        />
+                        <q-btn
+                            flat
+                            color="primary"
+                            label="Retour"
+                            class="q-ml-sm"
+                            @click="changeStep(5, 4)"
+                        />
                     </q-stepper-navigation>
                 </q-step>
             </q-stepper>

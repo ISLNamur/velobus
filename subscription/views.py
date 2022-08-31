@@ -61,7 +61,7 @@ class DateSubscriptionViewSet(ModelViewSet):
 
 
 class ResponsibleViewSet(ModelViewSet):
-    queryset = models.TrackModel.objects.all()
+    queryset = models.ResponsibleModel.objects.all()
     serializer_class = serializers.ResponsibleSerializer
 
     def perform_create(self, serializer):
