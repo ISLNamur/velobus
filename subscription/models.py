@@ -15,8 +15,8 @@ class TrackModel(models.Model):
 class StopModel(models.Model):
     name = models.CharField(max_length=200)
     track = models.ForeignKey(TrackModel, on_delete=models.CASCADE)
-    time_morning = models.TimeField()
-    time_afternoon = models.TimeField()
+    time_morning = models.TimeField(blank=True, null=True)
+    time_afternoon = models.TimeField(blank=True, null=True)
     place = models.CharField(max_length=500)
     picture = models.ImageField(upload_to="places", blank=True, null=True)
     coordinates = models.JSONField()
