@@ -220,7 +220,9 @@ onBeforeMount(() => {
 
     emit("exposeTrack", {
         setTrack: (trackId) => {
-            formData.track = mapStore.tracks.find((t) => t.id === trackId);
+            if (props.step === 1) {
+                formData.track = mapStore.tracks.find((t) => t.id === trackId);
+            }
         },
     });
 });
