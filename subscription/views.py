@@ -1,3 +1,4 @@
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
 from django.core.mail import send_mail
@@ -63,6 +64,8 @@ class DateSubscriptionViewSet(ModelViewSet):
 class ResponsibleViewSet(ModelViewSet):
     queryset = models.ResponsibleModel.objects.all()
     serializer_class = serializers.ResponsibleSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ["is_point_of_contact", "track"]
 
     def perform_create(self, serializer):
         instance = serializer.save()
