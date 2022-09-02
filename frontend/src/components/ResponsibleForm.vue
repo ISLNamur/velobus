@@ -1,6 +1,6 @@
 <script setup>
 import {
-    onBeforeMount, reactive, ref, watch, defineEmits,
+    onBeforeMount, reactive, ref, watch, defineEmits, computed,
 } from "vue";
 import { useRouter } from "vue-router";
 import axios from "axios";
@@ -44,6 +44,7 @@ defineExpose({ formData });
 const loading = ref(false);
 const schoolOptions = ref([]);
 const availableDates = ref([]);
+const pointOfContact = ref([]);
 const dates = ref([]);
 const trackForm = ref(null);
 const stopForm = ref(null);
@@ -176,13 +177,19 @@ function reloadPage() {
         });
 }
 
+const getPointOfContact = computed(
+    () => pointOfContact.value.find((pOC) => pOC.track === formData.track.id),
+);
+
 onBeforeMount(() => {
     Promise.all([
         axios.get("/subscription/api/school/"),
         axios.get("/subscription/api/available_date/"),
+        axios.get("/subscription/api/point_of_contact/"),
     ]).then((resps) => {
         schoolOptions.value = resps[0].data;
         availableDates.value = resps[1].data;
+        pointOfContact.value = resps[2].data;
 
         if (props.uuid) {
             axios.get(`/subscription/api/responsible/${props.uuid}`)
@@ -300,6 +307,11 @@ watch(() => formData.track, (newVal) => {
                         :rules="[val => !!val || 'Vous devez choisir un arrêt.']"
                         @update:model-value="selectTrackFromStop"
                     />
+                    <p v-if="getPointOfContact">
+                        <strong>Référent du tracé</strong>:
+                        {{ getPointOfContact.last_name }} {{ getPointOfContact.first_name }}
+                        ({{ getPointOfContact.phone_number }})
+                    </p>
                     <q-stepper-navigation>
                         <q-btn
                             color="primary"

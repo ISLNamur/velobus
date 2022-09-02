@@ -1,5 +1,7 @@
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
+from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet, GenericViewSet
+from rest_framework import mixins
+from rest_framework.permissions import IsAuthenticated
 
 from django.core.mail import send_mail
 from django.conf import settings
@@ -7,13 +9,26 @@ from django.conf import settings
 from . import models, serializers
 
 
-def send_welcome_mail(person: str, uuid: str, recipient: str) -> int:
+def send_welcome_mail(
+    person: str, uuid: str, recipient: str, track_id: int = None
+) -> int:
     subject = "Inscription vélobus"
     base_url = (
         f"https://{settings.ALLOWED_HOSTS[0]}"
         if settings.ALLOWED_HOSTS
         else "http://localhost"
     )
+    contacts = (
+        [
+            f"Référent du tracé ({contact.track.name}) : {contact.last_name} {contact.first_name} ({contact.phone_number})."
+            for contact in models.ResponsibleModel.filter(
+                track__id=track_id, is_point_of_contact=True
+            )
+        ]
+        if track_id
+        else []
+    )
+
     raw_message = (
         """Bonjour,
         Merci pour votre inscription. Retrouvez toutes les informations concernant votre inscription à l'adresse suivante:
@@ -21,10 +36,13 @@ def send_welcome_mail(person: str, uuid: str, recipient: str) -> int:
         + base_url
         + f"/#/{person}/1/{uuid}"
         + """
+        """
+        + "\n".join(contacts)
+        + """
         L'équipe Vélobus
         """
     )
-    html_message = f"<p>Bonjour</p><p>Merci pour votre inscription. Retrouvez toutes les informations concernant votre inscription par le lien suivant: <a href='{base_url}/#/{person}/1/{uuid}'>inscription</a>.</p><p>Cordialement<br>L'équipe Vélobus</p>"
+    html_message = f"<p>Bonjour</p><p>Merci pour votre inscription. Retrouvez toutes les informations concernant votre inscription par le lien suivant: <a href='{base_url}/#/{person}/1/{uuid}'>inscription</a>.<br>{'<br>'.join(contacts)}</p><p>Cordialement<br>L'équipe Vélobus</p>"
 
     return send_mail(
         subject=subject,
@@ -61,21 +79,49 @@ class DateSubscriptionViewSet(ModelViewSet):
     serializer_class = serializers.DateSubscriptionSerializer
 
 
-class ResponsibleViewSet(ModelViewSet):
+class ResponsibleViewSet(
+    mixins.UpdateModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.CreateModelMixin,
+    GenericViewSet,
+):
     queryset = models.ResponsibleModel.objects.all()
     serializer_class = serializers.ResponsibleSerializer
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ["is_point_of_contact", "track"]
 
     def perform_create(self, serializer):
         instance = serializer.save()
         send_welcome_mail("responsible", instance.uuid, instance.email)
 
 
-class StudentViewSet(ModelViewSet):
+class ResponsibleListView(ReadOnlyModelViewSet):
+    queryset = models.ResponsibleModel.objects.all()
+    serializer_class = serializers.ResponsibleSerializer
+    permission_classes = [IsAuthenticated]
+
+
+class PointOfContactViewSet(ReadOnlyModelViewSet):
+    queryset = models.ResponsibleModel.objects.filter(is_point_of_contact=True)
+    serializer_class = serializers.ResponsibleSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ["track"]
+
+
+class StudentViewSet(
+    mixins.UpdateModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.CreateModelMixin,
+    GenericViewSet,
+):
     queryset = models.StudentModel.objects.all()
     serializer_class = serializers.StudentSerializer
 
     def perform_create(self, serializer):
         instance = serializer.save()
-        send_welcome_mail("student", instance.uuid, instance.email)
+        track_id = instance.track.id
+        send_welcome_mail("student", instance.uuid, instance.email, track_id)
+
+
+class StudentListView(ReadOnlyModelViewSet):
+    queryset = models.ResponsibleModel.objects.all()
+    serializer_class = serializers.ResponsibleSerializer
+    permission_classes = [IsAuthenticated]
