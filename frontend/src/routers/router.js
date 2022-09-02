@@ -1,8 +1,11 @@
 import StudentForm from "../components/StudentForm.vue";
 import ResponsibleForm from "../components/ResponsibleForm.vue";
+import SubscriberList from "../components/SubscriberList.vue";
 
+// eslint-disable-next-line import/prefer-default-export
 export const routes = [
     { path: "/", component: StudentForm },
+    { path: "/list/", component: SubscriberList },
     {
         path: "/student/:step/:uuid",
         component: StudentForm,
