@@ -79,4 +79,3 @@ class StudentModel(PersonModel):
     postal_code = models.CharField(max_length=10)
     locality = models.CharField(max_length=40)
     student_phone = models.CharField(max_length=20, blank=True)
-    stop = models.ForeignKey(StopModel, on_delete=models.SET_NULL, null=True)
