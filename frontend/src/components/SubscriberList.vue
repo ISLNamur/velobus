@@ -7,6 +7,23 @@ const token = { xsrfCookieName: "csrftoken", xsrfHeaderName: "X-CSRFToken" };
 
 const mapStore = useMapStore();
 
+function objName(obj) {
+    if (!obj) return "";
+
+    return obj.name;
+}
+
+const availableDates = ref([]);
+function displaySub(subs) {
+    return subs.reduce((pV, cV) => {
+        // WRONG!
+        const aDate = availableDates.value.find((aD) => aD.id === cV).date;
+        const month = aDate.slice(5, 7);
+        const day = aDate.slice(8, 11);
+        return `${pV ? `${pV}, ` : ""}${day}/${month} (${cV.morning ? "M" : ""}|${cV.afternoon ? "A" : ""})`;
+    }, "");
+}
+
 const students = ref([]);
 const columns = [
     {
@@ -19,12 +36,43 @@ const columns = [
         field: "first_name",
         label: "Prénom",
     },
+    {
+        name: "track",
+        field: "track",
+        label: "Tracé",
+        format: (t) => objName(mapStore.tracks.find((tS) => tS.id === t)),
+    },
+    {
+        name: "stop",
+        field: "stop",
+        label: "Arrêt",
+        format: (s) => objName(mapStore.stops.find((tS) => tS.id === s)),
+    },
+    {
+        name: "subscription",
+        field: "subscription",
+        label: "Inscriptions",
+        format: (s) => displaySub(s),
+    },
+    {
+        name: "student_phone",
+        field: "student_phone",
+        label: "Tél. étudiant",
+    },
+    {
+        name: "phone_number",
+        field: "phone_number",
+        label: "Tél. responsable",
+    },
 ];
+
 onBeforeMount(() => {
     Promise.all([
         axios.get("/subscription/api/student_list"),
+        axios.get("/subscription/api/available_date"),
     ]).then((resps) => {
         students.value = resps[0].data;
+        availableDates.value = resps[1].data;
     });
 });
 
