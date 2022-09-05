@@ -116,3 +116,5 @@ EMAIL_HOST_PASSWORD = os.environ.get("DJANGO_EMAIL_HOST_PASSWORD", "")
 EMAIL_USE_TLS = os.environ.get("DJANGO_EMAIL_USE_TLS", False) == "True"
 EMAIL_USE_SSL = os.environ.get("DJANGO_EMAIL_USE_SSL", False) == "True"
 DEFAULT_FROM_EMAIL = os.environ.get("DJANGO_FROM_EMAIL", "")
+
+LOGIN_REDIRECT_URL = "/#/list"

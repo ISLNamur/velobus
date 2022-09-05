@@ -122,6 +122,6 @@ class StudentViewSet(
 
 
 class StudentListView(ReadOnlyModelViewSet):
-    queryset = models.ResponsibleModel.objects.all()
-    serializer_class = serializers.ResponsibleSerializer
+    queryset = models.StudentModel.objects.all()
+    serializer_class = serializers.StudentSerializer
     permission_classes = [IsAuthenticated]
