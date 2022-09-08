@@ -24,13 +24,10 @@ function updateTrackSelection(trackId) {
             <q-page padding>
                 <h1>Vélobus</h1>
                 <div class="row">
+                    <router-view class="col-12 col-sm-6" @expose-track="getTrackInterface" />
                     <TrackMap
                         class="col-12 col-sm-6"
                         @track-selected="updateTrackSelection"
-                    />
-                    <router-view
-                        class="col-12 col-sm-6"
-                        @expose-track="getTrackInterface"
                     />
                 </div>
             </q-page>
@@ -57,5 +54,9 @@ function updateTrackSelection(trackId) {
     text-align: center;
     color: #2c3e50;
     margin-top: 60px;
+}
+h1 {
+    margin-top: 0px;
+    margin-bottom: 0px;
 }
 </style>
