@@ -4,6 +4,9 @@ import TrackMap from "./components/TrackMap.vue";
 
 import { useMapStore } from "./stores/map";
 
+const halfView = "col-12 col-sm-6";
+const fullView = "col-12";
+
 const mapStore = useMapStore();
 mapStore.getData();
 
@@ -24,9 +27,9 @@ function updateTrackSelection(trackId) {
             <q-page padding>
                 <h1>Vélobus</h1>
                 <div class="row">
-                    <router-view class="col-12 col-sm-6" @expose-track="getTrackInterface" />
+                    <router-view :class="$route.path.includes('list') ? fullView : halfView" @expose-track="getTrackInterface" />
                     <TrackMap
-                        class="col-12 col-sm-6"
+                        :class="halfView + ` ${$route.path.includes('list') ? 'hidden' : ''}`"
                         @track-selected="updateTrackSelection"
                     />
                 </div>
