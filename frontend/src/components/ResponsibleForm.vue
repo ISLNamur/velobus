@@ -427,17 +427,19 @@ watch(() => formData.track, (newVal) => {
                             :key="date"
                             class="q-gutter-sm"
                         >
-                            <strong>{{ date.date }}</strong>
+                            <p class="datelabel">{{ date.date.slice(8, 10) }}/{{ date.date.slice(5, 7) }}</p>
                             <q-checkbox
                                 v-model="dates"
                                 :val="`${date.id}_morning_${date.dateSubId ? date.dateSubId : ''}`"
                                 label="Aller (matin)"
+                                dense
                             />
                             <q-checkbox
                                 v-model="dates"
                                 :val="`${date.id}_afternoon_${date.dateSubId ? date.dateSubId : ''
                                 }`"
                                 label="Retour (après-midi)"
+                                dense
                             />
                         </div>
                     </div>
