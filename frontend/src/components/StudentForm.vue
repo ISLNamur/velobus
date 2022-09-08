@@ -200,7 +200,7 @@ function reloadPage() {
 }
 
 const getPointOfContact = computed(
-    () => pointOfContact.value.find((pOC) => pOC.track === formData.track.id),
+    () => formData.track ? pointOfContact.value.find((pOC) => pOC.track === formData.track.id) : "",
 );
 
 onBeforeMount(() => {
