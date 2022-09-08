@@ -181,6 +181,14 @@ const getPointOfContact = computed(
     () => formData.track ? pointOfContact.value.find((pOC) => pOC.track === formData.track.id) : "",
 );
 
+const stopsFromTrack = computed(
+    () => {
+        if (!formData.track) return mapStore.stops;
+
+        return mapStore.stops.filter(s => s.track === formData.track.id)
+    }
+)
+
 onBeforeMount(() => {
     Promise.all([
         axios.get("/subscription/api/school/"),
@@ -300,7 +308,7 @@ watch(() => formData.track, (newVal) => {
                     <q-select
                         ref="stopForm"
                         v-model="formData.stop"
-                        :options="mapStore.stops"
+                        :options="stopsFromTrack"
                         option-value="id"
                         option-label="name"
                         label="Point de départ"
