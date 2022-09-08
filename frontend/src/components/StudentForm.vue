@@ -480,23 +480,28 @@ watch(() => formData.track, (newVal) => {
                     title="Dates des trajets"
                     :done="step > 4"
                 >
+                    <p v-if="formData.school">
+                        <strong>{{ formData.school.comment }}</strong>
+                    </p>
                     <div class="q-pa-md">
                         <div
                             v-for="date in availableDates"
                             :key="date"
                             class="q-gutter-sm"
                         >
-                            <strong>{{ date.date }}</strong>
+                            <p class="datelabel">{{ date.date.slice(8, 10) }}/{{ date.date.slice(5, 7) }}</p>
                             <q-checkbox
                                 v-model="dates"
                                 :val="`${date.id}_morning_${date.dateSubId ? date.dateSubId : ''}`"
                                 label="Aller (matin)"
+                                dense
                             />
                             <q-checkbox
                                 v-model="dates"
                                 :val="`${date.id}_afternoon_${date.dateSubId ? date.dateSubId : ''
                                 }`"
                                 label="Retour (après-midi)"
+                                dense
                             />
                         </div>
                     </div>
@@ -557,5 +562,13 @@ watch(() => formData.track, (newVal) => {
 <style>
 h3 {
     font-size: 2rem;
+}
+.datelabel {
+    margin-top: 15px;
+    margin-bottom: 0px;
+    padding: 0px;
+    font-weight: bold;
+    font-size: 1.2em;
+    border-top: 1px solid black;
 }
 </style>

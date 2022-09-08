@@ -27,6 +27,7 @@ class StopModel(models.Model):
 
 class SchoolModel(models.Model):
     name = models.CharField(max_length=100)
+    comment = models.CharField(max_length=500, default="", blank=True)
 
     def __str__(self):
         return self.name

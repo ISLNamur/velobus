@@ -418,6 +418,9 @@ watch(() => formData.track, (newVal) => {
                     title="Dates des trajets"
                     :done="step > 4"
                 >
+                    <p v-if="formData.school">
+                        <strong>{{ formData.school.comment }}</strong>
+                    </p>
                     <div class="q-pa-md">
                         <div
                             v-for="date in availableDates"
