@@ -43,3 +43,10 @@ class StudentSerializer(ModelSerializer):
     class Meta:
         model = models.StudentModel
         fields = "__all__"
+
+
+class StudentDepthSerializer(ModelSerializer):
+    class Meta:
+        model = models.StudentModel
+        fields = "__all__"
+        depth = 1

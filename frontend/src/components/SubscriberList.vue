@@ -16,11 +16,10 @@ function objName(obj) {
 const availableDates = ref([]);
 function displaySub(subs) {
     return subs.reduce((pV, cV) => {
-        // WRONG!
-        const aDate = availableDates.value.find((aD) => aD.id === cV).date;
+        const aDate = availableDates.value.find((aD) => aD.id === cV.subscription_date).date;
         const month = aDate.slice(5, 7);
         const day = aDate.slice(8, 11);
-        return `${pV ? `${pV}, ` : ""}${day}/${month} (${cV.morning ? "M" : ""}|${cV.afternoon ? "A" : ""})`;
+        return `${pV ? `${pV}, ` : ""}${day}/${month} (${cV.morning ? "M" : "-"}|${cV.afternoon ? "A" : "-"})`;
     }, "");
 }
 
@@ -40,13 +39,13 @@ const columns = [
         name: "track",
         field: "track",
         label: "Tracé",
-        format: (t) => objName(mapStore.tracks.find((tS) => tS.id === t)),
+        format: (t) => objName(t),
     },
     {
         name: "stop",
         field: "stop",
         label: "Arrêt",
-        format: (s) => objName(mapStore.stops.find((tS) => tS.id === s)),
+        format: (s) => objName(s),
     },
     {
         name: "subscription",
