@@ -125,3 +125,5 @@ class StudentListView(ReadOnlyModelViewSet):
     queryset = models.StudentModel.objects.all()
     serializer_class = serializers.StudentDepthSerializer
     permission_classes = [IsAuthenticated]
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ["track", "subscription__subscription_date"]

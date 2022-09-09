@@ -7,10 +7,25 @@ const token = { xsrfCookieName: "csrftoken", xsrfHeaderName: "X-CSRFToken" };
 
 const mapStore = useMapStore();
 
+const dateFilter = ref(null);
+const trackFilter = ref(null);
+const students = ref([]);
+
 function objName(obj) {
     if (!obj) return "";
 
     return obj.name;
+}
+
+function loadStudents() {
+    axios.get(`/subscription/api/student_list/?${
+        dateFilter.value ? `subscription__subscription_date=${dateFilter.value.id}&` : ""
+    }${
+        trackFilter.value ? `track=${trackFilter.value.id}&` : ""
+    }`)
+        .then((resp) => {
+            students.value = resp.data;
+        });
 }
 
 const availableDates = ref([]);
@@ -23,7 +38,6 @@ function displaySub(subs) {
     }, "");
 }
 
-const students = ref([]);
 const columns = [
     {
         name: "last_name",
@@ -67,22 +81,46 @@ const columns = [
 
 onBeforeMount(() => {
     Promise.all([
-        axios.get("/subscription/api/student_list"),
         axios.get("/subscription/api/available_date"),
     ]).then((resps) => {
-        students.value = resps[0].data;
-        availableDates.value = resps[1].data;
+        availableDates.value = resps[0].data;
+        loadStudents();
     });
 });
 
 </script>
 
 <template>
-    <div>
+    <div class="row">
         <q-table
             title="Liste des élèves inscrits"
             :rows="students"
             :columns="columns"
-        />
+            class="col-12"
+        >
+            <template #top="props">
+                <q-space />
+                <q-select
+                    v-model="dateFilter"
+                    label="Filtrer sur une date"
+                    :options="availableDates"
+                    option-value="id"
+                    option-label="date"
+                    style="min-width: 200px"
+                    clearable
+                    @update:model-value="loadStudents"
+                />
+                <q-select
+                    v-model="trackFilter"
+                    label="Filtrer sur un tracé"
+                    :options="mapStore.tracks"
+                    option-value="id"
+                    option-label="name"
+                    style="min-width: 200px;margin-left:10px"
+                    clearable
+                    @update:model-value="loadStudents"
+                />
+            </template>
+        </q-table>
     </div>
 </template>
