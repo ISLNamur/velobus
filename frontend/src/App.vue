@@ -1,6 +1,5 @@
 <script setup>
 import { ref } from "vue";
-import TrackMap from "./components/TrackMap.vue";
 
 import { useMapStore } from "./stores/map";
 
@@ -26,12 +25,8 @@ function updateTrackSelection(trackId) {
         <q-page-container>
             <q-page padding>
                 <h1>Vélobus</h1>
-                <div class="row">
-                    <router-view :class="$route.path.includes('list') ? fullView : halfView" @expose-track="getTrackInterface" />
-                    <TrackMap
-                        :class="halfView + ` ${$route.path.includes('list') ? 'hidden' : ''}`"
-                        @track-selected="updateTrackSelection"
-                    />
+                <div>
+                    <router-view @expose-track="getTrackInterface" />
                 </div>
             </q-page>
         </q-page-container>

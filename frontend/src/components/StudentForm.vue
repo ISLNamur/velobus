@@ -6,6 +6,7 @@ import { useRouter } from "vue-router";
 import axios from "axios";
 
 import { useMapStore } from "../stores/map";
+import TrackMap from "./TrackMap.vue";
 
 const token = { xsrfCookieName: "csrftoken", xsrfHeaderName: "X-CSRFToken" };
 
@@ -200,16 +201,16 @@ function reloadPage() {
 }
 
 const getPointOfContact = computed(
-    () => formData.track ? pointOfContact.value.find((pOC) => pOC.track === formData.track.id) : "",
+    () => (formData.track ? pointOfContact.value.find((pOC) => pOC.track === formData.track.id) : ""),
 );
 
 const stopsFromTrack = computed(
     () => {
         if (!formData.track) return mapStore.stops;
 
-        return mapStore.stops.filter(s => s.track === formData.track.id)
-    }
-)
+        return mapStore.stops.filter((s) => s.track === formData.track.id);
+    },
+);
 
 onBeforeMount(() => {
     Promise.all([
@@ -310,252 +311,260 @@ watch(() => formData.track, (newVal) => {
                 </q-card-actions>
             </q-card>
         </q-dialog>
-        <q-form>
-            <q-stepper
-                v-model="step"
-                vertical
-                color="primary"
-                animated
-            >
-                <q-step
-                    :name="1"
-                    title="Lieu de rencontre"
-                    :done="step > 1"
+        <div class="row">
+            <q-form class="col-12 col-sm-6">
+                <q-stepper
+                    v-model="step"
+                    vertical
+                    color="primary"
+                    animated
                 >
-                    <q-select
-                        ref="trackForm"
-                        v-model="formData.track"
-                        :options="mapStore.tracks"
-                        option-value="id"
-                        option-label="name"
-                        label="Choix du tracé"
-                        :rules="[val => !!val || 'Vous devez choisir un tracé.']"
-                    />
-                    <q-select
-                        ref="stopForm"
-                        v-model="formData.stop"
-                        :options="stopsFromTrack"
-                        option-value="id"
-                        option-label="name"
-                        label="Point de départ"
-                        :rules="[val => !!val || 'Vous devez choisir un arrêt.']"
-                        @update:model-value="selectTrackFromStop"
-                    />
-                    <p v-if="getPointOfContact">
-                        <strong>Référent du tracé</strong>:
-                        {{ getPointOfContact.last_name }} {{ getPointOfContact.first_name }}
-                        ({{ getPointOfContact.phone_number }})
-                    </p>
-                    <q-stepper-navigation>
-                        <q-btn
-                            color="primary"
-                            label="Continuer"
-                            @click="changeStep(1, 2)"
+                    <q-step
+                        :name="1"
+                        title="Lieu de rencontre"
+                        :done="step > 1"
+                    >
+                        <q-select
+                            ref="trackForm"
+                            v-model="formData.track"
+                            :options="mapStore.tracks"
+                            option-value="id"
+                            option-label="name"
+                            label="Choix du tracé"
+                            :rules="[val => !!val || 'Vous devez choisir un tracé.']"
                         />
-                    </q-stepper-navigation>
-                </q-step>
+                        <q-select
+                            ref="stopForm"
+                            v-model="formData.stop"
+                            :options="stopsFromTrack"
+                            option-value="id"
+                            option-label="name"
+                            label="Point de départ"
+                            :rules="[val => !!val || 'Vous devez choisir un arrêt.']"
+                            @update:model-value="selectTrackFromStop"
+                        />
+                        <p v-if="getPointOfContact">
+                            <strong>Référent du tracé</strong>:
+                            {{ getPointOfContact.last_name }} {{ getPointOfContact.first_name }}
+                            ({{ getPointOfContact.phone_number }})
+                        </p>
+                        <q-stepper-navigation>
+                            <q-btn
+                                color="primary"
+                                label="Continuer"
+                                @click="changeStep(1, 2)"
+                            />
+                        </q-stepper-navigation>
+                    </q-step>
 
-                <q-step
-                    :name="2"
-                    title="Identité de l'élève"
-                    :done="step > 2"
-                >
-                    <q-input
-                        ref="lastNameForm"
-                        v-model="formData.last_name"
-                        label="Nom de l'élève"
-                        :rules="[val => val.trim().length > 0 || 'Ce champ est nécessaire.']"
-                    />
-                    <q-input
-                        ref="firstNameForm"
-                        v-model="formData.first_name"
-                        label="Prénom de l'élève"
-                        :rules="[val => val.trim().length > 0 || 'Ce champ est nécessaire.']"
-                    />
-                    <q-select
-                        ref="schoolForm"
-                        v-model="formData.school"
-                        :options="schoolOptions"
-                        option-label="name"
-                        option-value="id"
-                        label="École de l'élève"
-                        :rules="[val => !!val || 'Vous devez choisir une école']"
-                    />
-                    <q-input
-                        ref="classeForm"
-                        v-model="formData.classe"
-                        label="Classe de l'élève"
-                        :rules="[val => val.trim().length > 0 || 'Ce champ est nécessaire.']"
-                    />
-                    <q-input
-                        ref="streetForm"
-                        v-model="formData.street"
-                        label="Rue"
-                        :rules="[val => val.trim().length > 0 || 'Ce champ est nécessaire.']"
-                    />
-                    <q-input
-                        ref="postalCodeForm"
-                        v-model="formData.postal_code"
-                        label="Code postal"
-                        type="number"
-                        :rules="[val => val > 999 && val < 10000 || 'Ce champ est nécessaire.']"
-                    />
-                    <q-input
-                        ref="localityForm"
-                        v-model="formData.locality"
-                        label="Localité"
-                        :rules="[val => val.trim().length > 0 || 'Ce champ est nécessaire.']"
-                    />
-                    <q-stepper-navigation>
-                        <q-btn
-                            color="primary"
-                            label="Continuer"
-                            @click="changeStep(2, 3)"
+                    <q-step
+                        :name="2"
+                        title="Identité de l'élève"
+                        :done="step > 2"
+                    >
+                        <q-input
+                            ref="lastNameForm"
+                            v-model="formData.last_name"
+                            label="Nom de l'élève"
+                            :rules="[val => val.trim().length > 0 || 'Ce champ est nécessaire.']"
                         />
-                        <q-btn
-                            flat
-                            color="primary"
-                            label="Retour"
-                            class="q-ml-sm"
-                            @click="changeStep(2, 1)"
+                        <q-input
+                            ref="firstNameForm"
+                            v-model="formData.first_name"
+                            label="Prénom de l'élève"
+                            :rules="[val => val.trim().length > 0 || 'Ce champ est nécessaire.']"
                         />
-                    </q-stepper-navigation>
-                </q-step>
+                        <q-select
+                            ref="schoolForm"
+                            v-model="formData.school"
+                            :options="schoolOptions"
+                            option-label="name"
+                            option-value="id"
+                            label="École de l'élève"
+                            :rules="[val => !!val || 'Vous devez choisir une école']"
+                        />
+                        <q-input
+                            ref="classeForm"
+                            v-model="formData.classe"
+                            label="Classe de l'élève"
+                            :rules="[val => val.trim().length > 0 || 'Ce champ est nécessaire.']"
+                        />
+                        <q-input
+                            ref="streetForm"
+                            v-model="formData.street"
+                            label="Rue"
+                            :rules="[val => val.trim().length > 0 || 'Ce champ est nécessaire.']"
+                        />
+                        <q-input
+                            ref="postalCodeForm"
+                            v-model="formData.postal_code"
+                            label="Code postal"
+                            type="number"
+                            :rules="[val => val > 999 && val < 10000 || 'Ce champ est nécessaire.']"
+                        />
+                        <q-input
+                            ref="localityForm"
+                            v-model="formData.locality"
+                            label="Localité"
+                            :rules="[val => val.trim().length > 0 || 'Ce champ est nécessaire.']"
+                        />
+                        <q-stepper-navigation>
+                            <q-btn
+                                color="primary"
+                                label="Continuer"
+                                @click="changeStep(2, 3)"
+                            />
+                            <q-btn
+                                flat
+                                color="primary"
+                                label="Retour"
+                                class="q-ml-sm"
+                                @click="changeStep(2, 1)"
+                            />
+                        </q-stepper-navigation>
+                    </q-step>
 
-                <q-step
-                    :name="3"
-                    title="Moyen de contact"
-                    :done="step > 3"
-                >
-                    <q-input
-                        ref="studentPhoneForm"
-                        v-model="formData.student_phone"
-                        label="GSM de l'élève"
-                        type="tel"
-                        :rules="[val => val.trim().length > 0 || 'Ce champ est nécessaire.']"
+                    <q-step
+                        :name="3"
+                        title="Moyen de contact"
+                        :done="step > 3"
                     >
-                        <template #prepend>
-                            <q-icon name="phone" />
-                        </template>
-                    </q-input>
-                    <q-input
-                        ref="phoneNumberForm"
-                        v-model="formData.phone_number"
-                        label="GSM d'un responsable"
-                        type="tel"
-                        :rules="[val => val.trim().length > 0 || 'Ce champ est nécessaire.']"
-                    >
-                        <template #prepend>
-                            <q-icon name="phone" />
-                        </template>
-                    </q-input>
-                    <q-input
-                        ref="emailForm"
-                        v-model="formData.email"
-                        label="Email de contact"
-                        type="email"
-                        :rules="['email' || 'Ce champ est nécessaire.']"
-                    >
-                        <template #prepend>
-                            <q-icon name="email" />
-                        </template>
-                    </q-input>
-                    <q-stepper-navigation>
-                        <q-btn
-                            color="primary"
-                            label="Continuer"
-                            @click="changeStep(3, 4)"
-                        />
-                        <q-btn
-                            flat
-                            color="primary"
-                            label="Retour"
-                            class="q-ml-sm"
-                            @click="changeStep(3, 2)"
-                        />
-                    </q-stepper-navigation>
-                </q-step>
-                <q-step
-                    :name="4"
-                    title="Dates des trajets"
-                    :done="step > 4"
-                >
-                    <p v-if="formData.school">
-                        <strong>{{ formData.school.comment }}</strong>
-                    </p>
-                    <div class="q-pa-md">
-                        <div
-                            v-for="date in availableDates"
-                            :key="date"
-                            class="q-gutter-sm"
+                        <q-input
+                            ref="studentPhoneForm"
+                            v-model="formData.student_phone"
+                            label="GSM de l'élève"
+                            type="tel"
+                            :rules="[val => val.trim().length > 0 || 'Ce champ est nécessaire.']"
                         >
-                            <p class="datelabel">{{ date.date.slice(8, 10) }}/{{ date.date.slice(5, 7) }}</p>
-                            <q-checkbox
-                                v-model="dates"
-                                :val="`${date.id}_morning_${date.dateSubId ? date.dateSubId : ''}`"
-                                label="Aller (matin)"
-                                dense
+                            <template #prepend>
+                                <q-icon name="phone" />
+                            </template>
+                        </q-input>
+                        <q-input
+                            ref="phoneNumberForm"
+                            v-model="formData.phone_number"
+                            label="GSM d'un responsable"
+                            type="tel"
+                            :rules="[val => val.trim().length > 0 || 'Ce champ est nécessaire.']"
+                        >
+                            <template #prepend>
+                                <q-icon name="phone" />
+                            </template>
+                        </q-input>
+                        <q-input
+                            ref="emailForm"
+                            v-model="formData.email"
+                            label="Email de contact"
+                            type="email"
+                            :rules="['email' || 'Ce champ est nécessaire.']"
+                        >
+                            <template #prepend>
+                                <q-icon name="email" />
+                            </template>
+                        </q-input>
+                        <q-stepper-navigation>
+                            <q-btn
+                                color="primary"
+                                label="Continuer"
+                                @click="changeStep(3, 4)"
                             />
-                            <q-checkbox
-                                v-model="dates"
-                                :val="`${date.id}_afternoon_${date.dateSubId ? date.dateSubId : ''
-                                }`"
-                                label="Retour (après-midi)"
-                                dense
+                            <q-btn
+                                flat
+                                color="primary"
+                                label="Retour"
+                                class="q-ml-sm"
+                                @click="changeStep(3, 2)"
                             />
+                        </q-stepper-navigation>
+                    </q-step>
+                    <q-step
+                        :name="4"
+                        title="Dates des trajets"
+                        :done="step > 4"
+                    >
+                        <p v-if="formData.school">
+                            <strong>{{ formData.school.comment }}</strong>
+                        </p>
+                        <div class="q-pa-md">
+                            <div
+                                v-for="date in availableDates"
+                                :key="date"
+                                class="q-gutter-sm"
+                            >
+                                <p class="datelabel">
+                                    {{ date.date.slice(8, 10) }}/{{ date.date.slice(5, 7) }}
+                                </p>
+                                <q-checkbox
+                                    v-model="dates"
+                                    :val="`${date.id}_morning_${
+                                        date.dateSubId ? date.dateSubId : ''
+                                    }`"
+                                    label="Aller (matin)"
+                                    dense
+                                />
+                                <q-checkbox
+                                    v-model="dates"
+                                    :val="`${date.id}_afternoon_${
+                                        date.dateSubId ? date.dateSubId : ''
+                                    }`"
+                                    label="Retour (après-midi)"
+                                    dense
+                                />
+                            </div>
                         </div>
-                    </div>
-                    <q-stepper-navigation>
+                        <q-stepper-navigation>
+                            <q-btn
+                                color="primary"
+                                label="Continuer"
+                                @click="changeStep(4, 5)"
+                            />
+                            <q-btn
+                                flat
+                                color="primary"
+                                label="Retour"
+                                class="q-ml-sm"
+                                @click="changeStep(4, 3)"
+                            />
+                        </q-stepper-navigation>
+                    </q-step>
+                    <q-step
+                        :name="5"
+                        title="Confirmation"
+                        :done="step > 5"
+                    >
+                        <q-checkbox v-model="acceptPolicy">
+                            <slot>
+                                Je confirme avoir lu et approuvé la convention ci-dessous.
+                            </slot>
+                        </q-checkbox>
                         <q-btn
                             color="primary"
-                            label="Continuer"
-                            @click="changeStep(4, 5)"
+                            icon="download"
+                            label="Télécharger la convention (pdf)"
+                            href="/static/convention.pdf"
+                            target="_blank"
                         />
-                        <q-btn
-                            flat
-                            color="primary"
-                            label="Retour"
-                            class="q-ml-sm"
-                            @click="changeStep(4, 3)"
-                        />
-                    </q-stepper-navigation>
-                </q-step>
-                <q-step
-                    :name="5"
-                    title="Confirmation"
-                    :done="step > 5"
-                >
-                    <q-checkbox v-model="acceptPolicy">
-                        <slot>
-                            Je confirme avoir lu et approuvé la convention ci-dessous.
-                        </slot>
-                    </q-checkbox>
-                    <q-btn
-                        color="primary"
-                        icon="download"
-                        label="Télécharger la convention (pdf)"
-                        href="/static/convention.pdf"
-                        target="_blank"
-                    />
-                    <q-stepper-navigation>
-                        <q-btn
-                            color="positive"
-                            label="Valider"
-                            :disable="!acceptPolicy"
-                            :loading="loading"
-                            @click="submitData('student')"
-                        />
-                        <q-btn
-                            flat
-                            color="primary"
-                            label="Retour"
-                            class="q-ml-sm"
-                            @click="changeStep(5, 4)"
-                        />
-                    </q-stepper-navigation>
-                </q-step>
-            </q-stepper>
-        </q-form>
+                        <q-stepper-navigation>
+                            <q-btn
+                                color="positive"
+                                label="Valider"
+                                :disable="!acceptPolicy"
+                                :loading="loading"
+                                @click="submitData('student')"
+                            />
+                            <q-btn
+                                flat
+                                color="primary"
+                                label="Retour"
+                                class="q-ml-sm"
+                                @click="changeStep(5, 4)"
+                            />
+                        </q-stepper-navigation>
+                    </q-step>
+                </q-stepper>
+            </q-form>
+            <TrackMap class="col-12 col-sm-6" />
+        </div>
     </div>
 </template>
 
