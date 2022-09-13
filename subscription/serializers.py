@@ -39,6 +39,13 @@ class ResponsibleSerializer(ModelSerializer):
         fields = "__all__"
 
 
+class ResponsibleDepthSerializer(ModelSerializer):
+    class Meta:
+        model = models.ResponsibleModel
+        fields = "__all__"
+        depth = 1
+
+
 class StudentSerializer(ModelSerializer):
     class Meta:
         model = models.StudentModel

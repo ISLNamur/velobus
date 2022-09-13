@@ -95,8 +95,10 @@ class ResponsibleViewSet(
 
 class ResponsibleListView(ReadOnlyModelViewSet):
     queryset = models.ResponsibleModel.objects.all()
-    serializer_class = serializers.ResponsibleSerializer
+    serializer_class = serializers.ResponsibleDepthSerializer
     permission_classes = [IsAuthenticated]
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ["track", "subscription__subscription_date"]
 
 
 class PointOfContactViewSet(ReadOnlyModelViewSet):
