@@ -37,7 +37,12 @@ function loadResponsibles() {
     }`)
         .then((resp) => {
             responsibles.value = resp.data;
-        });
+        })
+        .catch(err => {
+            if (err.response.status === 403) {
+                window.location.assign("/accounts/login");
+            } 
+        })
 }
 
 const availableDates = ref([]);
