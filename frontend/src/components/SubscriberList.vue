@@ -10,6 +10,7 @@ const mapStore = useMapStore();
 const dateFilter = ref(null);
 const trackFilter = ref(null);
 const students = ref([]);
+const responsibles = ref([]);
 
 function objName(obj) {
     if (!obj) return "";
@@ -25,6 +26,17 @@ function loadStudents() {
     }`)
         .then((resp) => {
             students.value = resp.data;
+        });
+}
+
+function loadResponsibles() { 
+    axios.get(`/subscription/api/responsible_list/?${
+        dateFilter.value ? `subscription__subscription_date=${dateFilter.value.id}&` : ""
+    }${
+        trackFilter.value ? `track=${trackFilter.value.id}&` : ""
+    }`)
+        .then((resp) => {
+            responsibles.value = resp.data;
         });
 }
 
@@ -79,12 +91,49 @@ const columns = [
     },
 ];
 
+const columns_resp = [
+    {
+        name: "last_name",
+        field: "last_name",
+        label: "Nom",
+    },
+    {
+        name: "first_name",
+        field: "first_name",
+        label: "Prénom",
+    },
+    {
+        name: "track",
+        field: "track",
+        label: "Tracé",
+        format: (t) => objName(t),
+    },
+    {
+        name: "stop",
+        field: "stop",
+        label: "Arrêt",
+        format: (s) => objName(s),
+    },
+    {
+        name: "subscription",
+        field: "subscription",
+        label: "Inscriptions",
+        format: (s) => displaySub(s),
+    },
+    {
+        name: "phone_number",
+        field: "phone_number",
+        label: "Tél. responsable",
+    },
+];
+
 onBeforeMount(() => {
     Promise.all([
         axios.get("/subscription/api/available_date"),
     ]).then((resps) => {
         availableDates.value = resps[0].data;
         loadStudents();
+        loadResponsibles();
     });
 });
 
@@ -96,6 +145,38 @@ onBeforeMount(() => {
             title="Liste des élèves inscrits"
             :rows="students"
             :columns="columns"
+            :pagination="{rowsPerPage: 10}"
+            class="col-12"
+        >
+            <template #top="props">
+                <q-space />
+                <q-select
+                    v-model="dateFilter"
+                    label="Filtrer date"
+                    :options="availableDates"
+                    option-value="id"
+                    option-label="date"
+                    style="min-width: 160px"
+                    clearable
+                    @update:model-value="loadStudents();loadResponsibles()"
+                />
+                <q-select
+                    v-model="trackFilter"
+                    label="Filtrer tracé"
+                    :options="mapStore.tracks"
+                    option-value="id"
+                    option-label="name"
+                    style="min-width: 160px;margin-left:10px"
+                    clearable
+                   @update:model-value="loadStudents();loadResponsibles()"
+                />
+            </template>
+        </q-table>
+        <q-table
+            title="Liste des responsables inscrits"
+            :rows="responsibles"
+            :columns="columns_resp"
+            :pagination="{rowsPerPage: 10}"
             class="col-12"
         >
             <template #top="props">
@@ -106,9 +187,9 @@ onBeforeMount(() => {
                     :options="availableDates"
                     option-value="id"
                     option-label="date"
-                    style="min-width: 200px"
+                    style="min-width: 160px"
                     clearable
-                    @update:model-value="loadStudents"
+                    @update:model-value="loadStudents();loadResponsibles()"
                 />
                 <q-select
                     v-model="trackFilter"
@@ -116,9 +197,9 @@ onBeforeMount(() => {
                     :options="mapStore.tracks"
                     option-value="id"
                     option-label="name"
-                    style="min-width: 200px;margin-left:10px"
+                    style="min-width: 160px;margin-left:10px"
                     clearable
-                    @update:model-value="loadStudents"
+                    @update:model-value="loadResponsibles"
                 />
             </template>
         </q-table>
