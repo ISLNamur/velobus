@@ -37,7 +37,7 @@ function updateTrackSelection(trackId) {
         >
             <q-toolbar>
                 <q-toolbar-title>
-                    <div>Title</div>
+                    <div>Vélobus</div>
                 </q-toolbar-title>
             </q-toolbar>
         </q-footer>
