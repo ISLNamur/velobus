@@ -149,6 +149,7 @@ onBeforeMount(() => {
             class="col-12"
         >
             <template #top="props">
+                <h3 class="gt-xs">Élèves</h3>
                 <q-space />
                 <q-select
                     v-model="dateFilter"
@@ -177,13 +178,14 @@ onBeforeMount(() => {
             :rows="responsibles"
             :columns="columns_resp"
             :pagination="{rowsPerPage: 10}"
-            class="col-12"
+            class="col-12 q-mt-sm"
         >
             <template #top="props">
+                <h3 class="gt-xs">Responsables</h3>
                 <q-space />
                 <q-select
                     v-model="dateFilter"
-                    label="Filtrer sur une date"
+                    label="Filtrer date"
                     :options="availableDates"
                     option-value="id"
                     option-label="date"
@@ -193,7 +195,7 @@ onBeforeMount(() => {
                 />
                 <q-select
                     v-model="trackFilter"
-                    label="Filtrer sur un tracé"
+                    label="Filtrer tracé"
                     :options="mapStore.tracks"
                     option-value="id"
                     option-label="name"
