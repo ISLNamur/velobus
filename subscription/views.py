@@ -21,7 +21,7 @@ def send_welcome_mail(
     contacts = (
         [
             f"Référent du tracé ({contact.track.name}) : {contact.last_name} {contact.first_name} ({contact.phone_number})."
-            for contact in models.ResponsibleModel.filter(
+            for contact in models.ResponsibleModel.objects.filter(
                 track__id=track_id, is_point_of_contact=True
             )
         ]
@@ -42,7 +42,7 @@ def send_welcome_mail(
         L'équipe Vélobus
         """
     )
-    html_message = f"<p>Bonjour</p><p>Merci pour votre inscription. Retrouvez toutes les informations concernant votre inscription par le lien suivant: <a href='{base_url}/#/{person}/1/{uuid}'>inscription</a>.<br>{'<br>'.join(contacts)}</p><p>Cordialement<br>L'équipe Vélobus</p>"
+    html_message = f"<p>Bonjour</p><p>Merci pour votre inscription. Retrouvez toutes les informations concernant votre inscription par le lien suivant: <a href='{base_url}/#/{person}/4/{uuid}'>inscription</a>. Vous pouvez également y changer vos dates de parcours.<br>{'<br>'.join(contacts)}</p><p>Cordialement<br>L'équipe Vélobus</p>"
 
     return send_mail(
         subject=subject,
