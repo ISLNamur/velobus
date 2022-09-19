@@ -51,7 +51,7 @@ function displaySub(subs) {
         const aDate = availableDates.value.find((aD) => aD.id === cV.subscription_date).date;
         const month = aDate.slice(5, 7);
         const day = aDate.slice(8, 11);
-        return `${pV ? `${pV}, ` : ""}${day}/${month} (${cV.morning ? "M" : "-"}|${cV.afternoon ? "A" : "-"})`;
+        return `${pV ? `${pV}, ` : ""}${day}/${month} (${cV.morning ? "A" : "-"}|${cV.afternoon ? "R" : "-"})`;
     }, "");
 }
 
@@ -81,7 +81,7 @@ const columns = [
     {
         name: "subscription",
         field: "subscription",
-        label: "Inscriptions",
+        label: "Inscriptions (Aller/Retour)",
         format: (s) => displaySub(s),
     },
     {
@@ -206,7 +206,7 @@ onBeforeMount(() => {
                     option-label="name"
                     style="min-width: 160px;margin-left:10px"
                     clearable
-                    @update:model-value="loadResponsibles"
+                    @update:model-value="loadResponsibles();loadStudents();"
                 />
             </template>
         </q-table>
