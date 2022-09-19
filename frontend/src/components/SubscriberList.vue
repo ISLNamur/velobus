@@ -47,8 +47,13 @@ function loadResponsibles() {
 
 const availableDates = ref([]);
 function displaySub(subs) {
-    return subs.reduce((pV, cV) => {
-        const aDate = availableDates.value.find((aD) => aD.id === cV.subscription_date).date;
+    const subsWithDates = subs.map(s => {
+        const aDate = availableDates.value.find((aD) => aD.id === s.subscription_date);
+	return {morning: s.morning, afternoon: s.afternoon, subscription_date: aDate.date};
+    }).sort((s1, s2) => s1.subscription_date > s2.subscription_date);
+    
+    return subsWithDates.reduce((pV, cV) => {
+        const aDate = cV.subscription_date;
         const month = aDate.slice(5, 7);
         const day = aDate.slice(8, 11);
         return `${pV ? `${pV}, ` : ""}${day}/${month} (${cV.morning ? "A" : "-"}|${cV.afternoon ? "R" : "-"})`;
@@ -122,7 +127,7 @@ const columns_resp = [
     {
         name: "subscription",
         field: "subscription",
-        label: "Inscriptions",
+        label: "Inscriptions (Aller/Retour)",
         format: (s) => displaySub(s),
     },
     {
