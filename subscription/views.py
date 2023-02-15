@@ -1,10 +1,17 @@
+import uuid
+import requests
+
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet, GenericViewSet
 from rest_framework import mixins
+from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 
 from django.core.mail import send_mail
+from django.core.exceptions import ObjectDoesNotExist
+from django.contrib.auth.models import User
 from django.conf import settings
+from django.http import HttpResponse
 
 from . import models, serializers
 
@@ -38,11 +45,26 @@ def send_welcome_mail(
         + """
         """
         + "\n".join(contacts)
+        + "Dès que votre inscription est validée et votre mot de passe généré, retrouvez les inscriptions à l'adresse suivante :"
+        if person == "responsible"
+        else "" + f"{base_url}/#/list"
+        if person == "responsible"
+        else ""
         + """
         L'équipe Vélobus
         """
     )
-    html_message = f"<p>Bonjour</p><p>Merci pour votre inscription. Retrouvez toutes les informations concernant votre inscription par le lien suivant: <a href='{base_url}/#/{person}/4/{uuid}'>inscription</a>. Vous pouvez également y changer vos dates de parcours.<br>{'<br>'.join(contacts)}</p><p>Cordialement<br>L'équipe Vélobus</p>"
+    html_message = (
+        """<p>Bonjour</p><p>Merci pour votre inscription. Retrouvez toutes les informations concernant votre inscription par le lien suivant:
+    """
+        + f" <a href='{base_url}/#/{person}/4/{uuid}'>inscription</a>."
+        + f"Vous pouvez également y changer vos dates de parcours.<br>{'<br>'.join(contacts)}</p>"
+        + "<p>Dès que votre inscription est validée et votre mot de passe généré, retrouvez les inscriptions à l'adresse suivante :"
+        if person == "responsible"
+        else "" + f"<a href='{base_url}/#/list'>{base_url}/#/list</a></p>"
+        if person == "responsible"
+        else "" + "<p>Cordialement<br>L'équipe Vélobus</p>"
+    )
 
     return send_mail(
         subject=subject,
@@ -90,7 +112,49 @@ class ResponsibleViewSet(
 
     def perform_create(self, serializer):
         instance = serializer.save()
+        user = User.objects.create_user(instance.email, instance.email, uuid.uuid4())
+        instance.user = user
+        instance.save()
         send_welcome_mail("responsible", instance.uuid, instance.email)
+
+
+class ValidateAPI(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, uuid, format=None):
+        response = HttpResponse()
+        try:
+            responsible = models.ResponsibleModel.objects.get(uuid=uuid)
+            responsible.validated = True
+            responsible.save()
+        except ObjectDoesNotExist:
+            response.status_code = 404
+            return response
+
+        domain = (
+            f"{settings.ALLOWED_HOSTS[0]}" if settings.ALLOWED_HOSTS else "127.0.0.1:8000"
+        )
+
+        url = f"http{'' if settings.DEBUG else 's'}://{domain}/accounts/password_reset/"
+
+        client = requests.session()
+        client.get(url)
+        csrftoken = client.cookies["csrftoken"]
+        data = {
+            "email": responsible.email,
+            "csrfmiddlewaretoken": csrftoken,
+        }
+
+        cookies = dict(client.cookies)
+        requests.post(
+            url,
+            data=data,
+            headers={"HTTP_HOST": domain, "X-CSRFToken": csrftoken},
+            cookies=cookies,
+        )
+
+        response.status_code = 201
+        return response
 
 
 class ResponsibleListView(ReadOnlyModelViewSet):

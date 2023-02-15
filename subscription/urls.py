@@ -4,7 +4,9 @@ from rest_framework.routers import DefaultRouter
 
 from . import views
 
-urlpatterns = []
+urlpatterns = [
+    path("api/validate/<uuid>/", views.ValidateAPI.as_view()),
+]
 
 
 router = DefaultRouter()

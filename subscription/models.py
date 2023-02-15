@@ -71,6 +71,7 @@ class PersonModel(models.Model):
 
 class ResponsibleModel(PersonModel):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    validated = models.BooleanField(default=False)
     is_point_of_contact = models.BooleanField(default=False)
 
 

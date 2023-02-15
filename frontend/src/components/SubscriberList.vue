@@ -1,6 +1,7 @@
 <script setup>
 import axios from "axios";
 import { ref, onBeforeMount } from "vue";
+import { useQuasar } from "quasar";
 import { useMapStore } from "../stores/map";
 
 const token = { xsrfCookieName: "csrftoken", xsrfHeaderName: "X-CSRFToken" };
@@ -11,6 +12,8 @@ const dateFilter = ref(null);
 const trackFilter = ref(null);
 const students = ref([]);
 const responsibles = ref([]);
+
+const $q = useQuasar();
 
 function objName(obj) {
     if (!obj) return "";
@@ -29,7 +32,7 @@ function loadStudents() {
         });
 }
 
-function loadResponsibles() { 
+function loadResponsibles() {
     axios.get(`/subscription/api/responsible_list/?${
         dateFilter.value ? `subscription__subscription_date=${dateFilter.value.id}&` : ""
     }${
@@ -38,20 +41,38 @@ function loadResponsibles() {
         .then((resp) => {
             responsibles.value = resp.data;
         })
-        .catch(err => {
+        .catch((err) => {
             if (err.response.status === 403) {
                 window.location.assign("/accounts/login");
-            } 
-        })
+            }
+        });
+}
+
+function validate(responsibleId) {
+    $q.dialog({
+        title: "Valider la personne",
+        message: "La personne n'est pas encore validée et ne peut donc pas accéder à la liste des inscriptions (ainsi que toutes les données personnelles !). Si vous reconnaissez cette personne, vous pouvez la valider en cliquant sur «Valider».",
+        cancel: "Annuler",
+        ok: {
+            color: "primary",
+            label: "Valider",
+        },
+    }).onOk(() => {
+        axios.post(`/subscription/api/validate/${responsibleId}/`, { validated: true }, token)
+            .then(() => {
+                const validatedResp = responsibles.value.find((r) => r.uuid === responsibleId);
+                validatedResp.validated = true;
+            });
+    });
 }
 
 const availableDates = ref([]);
 function displaySub(subs) {
-    const subsWithDates = subs.map(s => {
+    const subsWithDates = subs.map((s) => {
         const aDate = availableDates.value.find((aD) => aD.id === s.subscription_date);
-	return {morning: s.morning, afternoon: s.afternoon, subscription_date: aDate.date};
+        return { morning: s.morning, afternoon: s.afternoon, subscription_date: aDate.date };
     }).sort((s1, s2) => s1.subscription_date > s2.subscription_date);
-    
+
     return subsWithDates.reduce((pV, cV) => {
         const aDate = cV.subscription_date;
         const month = aDate.slice(5, 7);
@@ -135,6 +156,11 @@ const columns_resp = [
         field: "phone_number",
         label: "Tél. responsable",
     },
+    {
+        name: "validated",
+        field: "validated",
+        label: "Validé",
+    },
 ];
 
 onBeforeMount(() => {
@@ -159,7 +185,9 @@ onBeforeMount(() => {
             class="col-12"
         >
             <template #top="props">
-                <h3 class="gt-xs">Élèves</h3>
+                <h3 class="gt-xs">
+                    Élèves
+                </h3>
                 <q-space />
                 <q-select
                     v-model="dateFilter"
@@ -179,7 +207,7 @@ onBeforeMount(() => {
                     option-label="name"
                     style="min-width: 160px;margin-left:10px"
                     clearable
-                   @update:model-value="loadStudents();loadResponsibles()"
+                    @update:model-value="loadStudents();loadResponsibles()"
                 />
             </template>
         </q-table>
@@ -191,7 +219,9 @@ onBeforeMount(() => {
             class="col-12 q-mt-sm"
         >
             <template #top="props">
-                <h3 class="gt-xs">Responsables</h3>
+                <h3 class="gt-xs">
+                    Responsables
+                </h3>
                 <q-space />
                 <q-select
                     v-model="dateFilter"
@@ -213,6 +243,26 @@ onBeforeMount(() => {
                     clearable
                     @update:model-value="loadResponsibles();loadStudents();"
                 />
+            </template>
+            <template #body-cell-validated="props">
+                <q-td>
+                    <span v-if="props.row.validated">
+                        <q-icon
+                            name="check"
+                            color="positive"
+                        />
+                    </span>
+                    <span v-else>
+                        <q-btn
+                            size="sm"
+                            color="primary"
+                            icon="check"
+                            @click="validate(props.row.uuid)"
+                        >
+                            Valider
+                        </q-btn>
+                    </span>
+                </q-td>
             </template>
         </q-table>
     </div>
