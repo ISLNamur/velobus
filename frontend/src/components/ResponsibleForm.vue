@@ -9,6 +9,8 @@ import { useMapStore } from "../stores/map";
 import TrackMap from "./TrackMap.vue";
 
 const token = { xsrfCookieName: "csrftoken", xsrfHeaderName: "X-CSRFToken" };
+// eslint-disable-next-line no-undef
+const scheduleCommentText = scheduleComment;
 
 const mapStore = useMapStore();
 const router = useRouter();
@@ -317,6 +319,23 @@ watch(() => formData.track, (newVal) => {
                             :rules="[val => !!val || 'Vous devez choisir un arrêt.']"
                             @update:model-value="selectTrackFromStop"
                         />
+                        <p v-if="scheduleCommentText">
+                            {{ scheduleCommentText }}
+                        </p>
+                        <p v-if="formData.stop">
+                            <span v-if="formData.stop.time_morning">
+                                Heure de départ vers l'école :
+                                <strong>
+                                    {{ formData.stop.time_morning.slice(0, 5).replace(":", "h") }}
+                                </strong><br>
+                            </span>
+                            <span v-if="formData.stop.time_afternoon">
+                                Heure de retour :
+                                <strong>
+                                    {{ formData.stop.time_afternoon.slice(0, 5).replace(":", "h") }}
+                                </strong>
+                            </span>
+                        </p>
                         <p v-if="getPointOfContact">
                             <strong>Référent du tracé</strong>:
                             {{ getPointOfContact.last_name }} {{ getPointOfContact.first_name }}
