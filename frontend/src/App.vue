@@ -5,6 +5,8 @@ import { useMapStore } from "./stores/map";
 
 const halfView = "col-12 col-sm-6";
 const fullView = "col-12";
+// eslint-disable-next-line no-undef
+const formTitleText = formTitle;
 
 const mapStore = useMapStore();
 mapStore.getData();
@@ -24,7 +26,7 @@ function updateTrackSelection(trackId) {
     <q-layout view="hHh lpR fFf">
         <q-page-container>
             <q-page padding>
-                <h1>Vélobus</h1>
+                <h1>{{ formTitleText }}</h1>
                 <div>
                     <router-view @expose-track="getTrackInterface" />
                 </div>
@@ -37,7 +39,10 @@ function updateTrackSelection(trackId) {
         >
             <q-toolbar>
                 <q-toolbar-title>
-                    <div>{{ formTitle }}</div>
+                    <div>
+                        <a href="https://github.com/ISLNamur/velobus">Vélobus</a> est un logiciel libre sous licence
+                        <a href="https://www.gnu.org/licenses/agpl-3.0.html">AGPL 3.0</a>.
+                    </div>
                 </q-toolbar-title>
             </q-toolbar>
         </q-footer>
