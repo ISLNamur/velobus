@@ -16,7 +16,12 @@ urlpatterns = [
     path(
         "",
         TemplateView.as_view(
-            template_name="subscription.html", extra_context={"is_debug": settings.DEBUG}
+            template_name="subscription.html",
+            extra_context={
+                "is_debug": settings.DEBUG,
+                "form_title": settings.FORM_TITLE,
+                "schedule_comment": settings.SCHEDULE_COMMENT,
+            },
         ),
     ),
     path("subscription/", include("subscription.urls"), name="subscription"),

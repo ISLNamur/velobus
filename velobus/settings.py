@@ -114,3 +114,6 @@ if DEBUG:
     EMAIL_FILE_PATH = BASE_DIR / "sent_emails_debug"
 
 LOGIN_REDIRECT_URL = "/#/list"
+
+FORM_TITLE = os.environ.get("FORM_TITLE", "Vélobus")
+SCHEDULE_COMMENT = os.environ.get("SCHEDULE_COMMENT", "")
