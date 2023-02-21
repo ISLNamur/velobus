@@ -6,12 +6,14 @@ import {
 import { useMapStore } from "../stores/map";
 
 const mapStore = useMapStore();
+const mapZoomData = mapZoom;
+const mapCenterData = mapCenter;
 
 const emit = defineEmits(["trackSelected"]);
 const mapOsm = ref({});
 
 onMounted(() => {
-    mapOsm.value = L.map("mapid").setView([50.4658, 4.8671], 12);
+    mapOsm.value = L.map("mapid").setView(mapCenterData, mapZoomData);
     const osm = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         maxZoom: 19,
         attribution: "&copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a>",

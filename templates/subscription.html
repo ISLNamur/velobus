@@ -12,6 +12,8 @@
 <script>
     const formTitle = "{{ form_title|safe }}";
     const scheduleComment = "{{ schedule_comment|safe }}";
+    const mapCenter = {{ map_center|safe }};
+    const mapZoom = {{ map_zoom|safe }};
 </script>
 {% if is_debug %}
 <script type="module" src="http://127.0.0.1:3000/src/main.js"></script>

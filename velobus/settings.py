@@ -117,3 +117,5 @@ LOGIN_REDIRECT_URL = "/#/list"
 
 FORM_TITLE = os.environ.get("FORM_TITLE", "Vélobus")
 SCHEDULE_COMMENT = os.environ.get("SCHEDULE_COMMENT", "")
+MAP_CENTER = os.environ.get("MAP_CENTER", [50.46574, 4.86696])
+MAP_ZOOM = os.environ.get("MAP_ZOOM", 12)

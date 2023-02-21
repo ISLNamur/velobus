@@ -21,6 +21,8 @@ urlpatterns = [
                 "is_debug": settings.DEBUG,
                 "form_title": settings.FORM_TITLE,
                 "schedule_comment": settings.SCHEDULE_COMMENT,
+                "map_center": settings.MAP_CENTER,
+                "map_zoom": settings.MAP_ZOOM,
             },
         ),
     ),
