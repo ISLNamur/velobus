@@ -36,6 +36,12 @@ def send_welcome_mail(
         else []
     )
 
+    resp_list_access = (
+        f"Dès que votre inscription est validée et votre mot de passe généré, retrouvez les inscriptions à l'adresse suivante : {base_url}/#/list"
+        if person == "responsible"
+        else ""
+    )
+
     raw_message = (
         """Bonjour,
         Merci pour votre inscription. Retrouvez toutes les informations concernant votre inscription à l'adresse suivante:
@@ -45,11 +51,7 @@ def send_welcome_mail(
         + """
         """
         + "\n".join(contacts)
-        + "Dès que votre inscription est validée et votre mot de passe généré, retrouvez les inscriptions à l'adresse suivante :"
-        if person == "responsible"
-        else "" + f"{base_url}/#/list"
-        if person == "responsible"
-        else ""
+        + resp_list_access
         + """
         L'équipe Vélobus
         """
@@ -65,8 +67,7 @@ def send_welcome_mail(
         """<p>Bonjour</p><p>Merci pour votre inscription. Retrouvez toutes les informations concernant votre inscription par le lien suivant:
     """
         + f" <a href='{base_url}/#/{person}/4/{uuid}'>inscription</a>."
-        + f"Vous pouvez également y changer vos dates de parcours.<br>{'<br>'.join(contacts)}</p>"
-        + "<p>Dès que votre inscription est validée et votre mot de passe généré, retrouvez les inscriptions à l'adresse suivante :"
+        + f" Vous pouvez également y changer vos dates de parcours.<br>{'<br>'.join(contacts)}</p>"
         + resp_list_access
         + "<p>Cordialement<br>L'équipe Vélobus</p>"
     )
