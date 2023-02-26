@@ -112,7 +112,7 @@ class ResponsibleViewSet(
 
     def perform_create(self, serializer):
         instance = serializer.save()
-        user = User.objects.create_user(instance.email, instance.email, uuid.uuid4())
+        user = User.objects.create_user(instance.email, instance.email, str(uuid.uuid4()))
         instance.user = user
         instance.save()
         send_welcome_mail("responsible", instance.uuid, instance.email)
