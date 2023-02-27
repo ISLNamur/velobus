@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 # Velobus
 # Copyright (C) 2023  Manuel Tondeur
 
@@ -14,7 +16,6 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#!/usr/bin/env python
 """Django's command-line utility for administrative tasks."""
 import os
 import sys
