@@ -39,8 +39,9 @@ watch([() => mapStore.tracks, () => mapStore.stops], ([newTracks, newStops]) => 
 
     newStops.forEach((stop) => {
         L.marker([stop.coordinates[1], stop.coordinates[0]])
-            .bindPopup(`<strong>Lieu</strong>: ${stop.place} </ br><strong>Départ</strong>: ${stop.time_morning ? stop.time_morning.slice(0, 5) : ""} <strong>Retour</strong>: ${stop.time_afternoon ? stop.time_afternoon.slice(0, 5) : ""}`)
-            .addTo(mapOsm.value);
+            .bindPopup(
+                `<strong>Lieu</strong>: ${stop.place} </ br><strong>Départ</strong>: ${stop.time_morning ? stop.time_morning.slice(0, 5) : ""} ${stop.time_afternoon ? "<strong>Retour</strong>:" : ""} ${stop.time_afternoon ? stop.time_afternoon.slice(0, 5) : ""}`,
+            ).addTo(mapOsm.value);
     });
 });
 
