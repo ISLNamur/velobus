@@ -582,7 +582,10 @@ watch(() => formData.track, (newVal) => {
                     </q-step>
                 </q-stepper>
             </q-form>
-            <TrackMap class="col-12 col-sm-6" />
+            <TrackMap
+                class="col-12 col-sm-6"
+                @track-selected="formData.track = mapStore.tracks.find((t) => t.id === $event)"
+            />
         </div>
     </div>
 </template>
