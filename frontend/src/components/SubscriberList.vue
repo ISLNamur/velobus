@@ -128,16 +128,6 @@ const columns = [
         label: "Inscriptions (Aller/Retour)",
         format: (s) => displaySub(s),
     },
-    {
-        name: "student_phone",
-        field: "student_phone",
-        label: "Tél. étudiant",
-    },
-    {
-        name: "phone_number",
-        field: "phone_number",
-        label: "Tél. responsable",
-    },
 ];
 
 const columns_resp = [
@@ -201,6 +191,7 @@ onBeforeMount(() => {
             :columns="columns"
             :pagination="{rowsPerPage: 10}"
             class="col-12"
+            row-key="uuid"
         >
             <template #top="props">
                 <h3 class="gt-xs">
@@ -227,6 +218,54 @@ onBeforeMount(() => {
                     clearable
                     @update:model-value="loadStudents();loadResponsibles()"
                 />
+            </template>
+            <template #header="props">
+                <q-tr :props="props">
+                    <q-th auto-width />
+                    <q-th
+                        v-for="col in props.cols"
+                        :key="col.name"
+                        :props="props"
+                    >
+                        {{ col.label }}
+                    </q-th>
+                </q-tr>
+            </template>
+            <template #body="props">
+                <q-tr :props="props">
+                    <q-td auto-width>
+                        <q-btn
+                            size="sm"
+                            color="accent"
+                            round
+                            dense
+                            :icon="props.expand ? 'remove' : 'add'"
+                            @click="props.expand = !props.expand"
+                        />
+                    </q-td>
+                    <q-td
+                        v-for="col in props.cols"
+                        :key="col.name"
+                        :props="props"
+                    >
+                        {{ col.value }}
+                    </q-td>
+                </q-tr>
+                <q-tr
+                    v-show="props.expand"
+                    :props="props"
+                >
+                    <q-td colspan="100%">
+                        <div class="text-left">
+                            Tél. étudiant: {{ props.row.student_phone }} <br>
+                            Tél. responsable: {{ props.row.phone_number }} <br>
+                            École: {{ props.row.school.name }} <br>
+                            Classe: {{ props.row.classe }}<br>
+                            Adresse: {{ props.row.street }} –
+                            {{ props.row.postal_code }} {{ props.row.locality }}
+                        </div>
+                    </q-td>
+                </q-tr>
             </template>
         </q-table>
         <q-table
