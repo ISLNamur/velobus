@@ -53,7 +53,7 @@ def send_welcome_mail(
     )
 
     resp_list_access = (
-        f"Dès que votre inscription est validée et votre mot de passe généré, retrouvez les inscriptions à l'adresse suivante : {base_url}/#/list"
+        f"Dès que votre inscription est validée par un autre responsable, un mail vous sera envoyé pour générer votre mot de passe. Vous pourrez alors retrouver les inscriptions des élèves à l'adresse suivante : {base_url}/#/list"
         if person == "responsible"
         else ""
     )
@@ -74,7 +74,7 @@ def send_welcome_mail(
     )
 
     resp_list_access = (
-        f"<p>Dès que votre inscription est validée et votre mot de passe généré, retrouvez les inscriptions à l'adresse suivante : <a href='{base_url}/#/list'>{base_url}/#/list</a></p>"
+        f"<p>Dès que votre inscription est validée par un autre responsable, un mail vous sera envoyé pour générer votre mot de passe. Vous pourrez alors retrouver les inscriptions des élèves à l'adresse suivante : <a href='{base_url}/#/list'>{base_url}/#/list</a></p>"
         if person == "responsible"
         else ""
     )
