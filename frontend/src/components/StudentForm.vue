@@ -226,9 +226,10 @@ const getPointOfContact = computed(
 
 const stopsFromTrack = computed(
     () => {
-        if (!formData.track) return mapStore.stops;
+        const stopsWithoutNoMarker = mapStore.stops.filter((s) => !s.no_marker);
+        if (!formData.track) return stopsWithoutNoMarker;
 
-        return mapStore.stops.filter((s) => s.track === formData.track.id);
+        return stopsWithoutNoMarker.filter((s) => s.track === formData.track.id);
     },
 );
 
