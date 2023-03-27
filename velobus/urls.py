@@ -39,6 +39,7 @@ urlpatterns = [
                 "schedule_comment": settings.SCHEDULE_COMMENT,
                 "map_center": settings.MAP_CENTER,
                 "map_zoom": settings.MAP_ZOOM,
+                "end_text": settings.END_TEXT,
             },
         ),
     ),

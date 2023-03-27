@@ -29,9 +29,12 @@ import TrackMap from "./TrackMap.vue";
 const token = { xsrfCookieName: "csrftoken", xsrfHeaderName: "X-CSRFToken" };
 // eslint-disable-next-line no-undef
 const scheduleCommentText = scheduleComment;
+// eslint-disable-next-line no-undef
+const endTextData = endText;
 
 const mapStore = useMapStore();
 const router = useRouter();
+
 
 const props = defineProps({
     uuid: {
@@ -589,13 +592,18 @@ watch(() => formData.track, (newVal) => {
                                 Je confirme avoir lu et approuvé la convention ci-dessous.
                             </slot>
                         </q-checkbox>
-                        <q-btn
-                            color="primary"
-                            icon="download"
-                            label="Télécharger la convention (pdf)"
-                            href="/static/convention.pdf"
-                            target="_blank"
-                        />
+                        <p>
+                            <q-btn
+                                color="primary"
+                                icon="download"
+                                label="Télécharger la convention (pdf)"
+                                href="/static/convention.pdf"
+                                target="_blank"
+                            />
+                        </p>
+                        <p class="mt-3">
+                            <span v-html="endTextData"></span>
+                        </p>
                         <q-stepper-navigation>
                             <q-btn
                                 color="positive"
