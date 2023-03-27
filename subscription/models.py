@@ -23,6 +23,7 @@ class TrackModel(models.Model):
     name = models.CharField(max_length=100)
     color = models.CharField(max_length=10)
     track_coordinates = models.JSONField()
+    point_of_contact = models.ManyToManyField("subscription.ResponsibleModel", blank=True)
 
     def __str__(self):
         return self.name
@@ -89,7 +90,6 @@ class PersonModel(models.Model):
 class ResponsibleModel(PersonModel):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     validated = models.BooleanField(default=False)
-    is_point_of_contact = models.BooleanField(default=False)
 
 
 class StudentModel(PersonModel):

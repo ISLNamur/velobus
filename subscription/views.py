@@ -41,12 +41,11 @@ def send_welcome_mail(
         if settings.ALLOWED_HOSTS
         else "http://localhost"
     )
+
     contacts = (
         [
-            f"Référent du tracé ({contact.track.name}) : {contact.last_name} {contact.first_name} ({contact.phone_number})."
-            for contact in models.ResponsibleModel.objects.filter(
-                track__id=track_id, is_point_of_contact=True
-            )
+            f"{resp.last_name} {resp.first_name} – {resp.phone_number}"
+            for resp in models.TrackModel.objects.get(id=track_id).point_of_contact.all()
         ]
         if track_id
         else []
@@ -66,7 +65,7 @@ def send_welcome_mail(
         + f"/#/{person}/1/{uuid}"
         + """
         """
-        + "\n".join(contacts)
+        + "\nRéférents du tracé:\n" + "\n".join(contacts) + "\n"
         + resp_list_access
         + """
         L'équipe Vélobus
@@ -83,7 +82,7 @@ def send_welcome_mail(
         """<p>Bonjour</p><p>Merci pour votre inscription. Retrouvez toutes les informations concernant votre inscription par le lien suivant:
     """
         + f" <a href='{base_url}/#/{person}/4/{uuid}'>inscription</a>."
-        + f" Vous pouvez également y changer vos dates de parcours.<br>{'<br>'.join(contacts)}</p>"
+        + f" Vous pouvez également y changer vos dates de parcours.<br>Référents du tracés:<br>{'<br>'.join(contacts)}</p>"
         + resp_list_access
         + "<p>Cordialement<br>L'équipe Vélobus</p>"
     )
@@ -137,7 +136,7 @@ class ResponsibleViewSet(
         user = User.objects.create_user(instance.email, instance.email, str(uuid.uuid4()))
         instance.user = user
         instance.save()
-        send_welcome_mail("responsible", instance.uuid, instance.email)
+        send_welcome_mail("responsible", instance.uuid, instance.email, instance.track.id)
 
 
 class ValidateAPI(APIView):
@@ -185,13 +184,6 @@ class ResponsibleListView(ReadOnlyModelViewSet):
     permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ["track", "subscription__subscription_date"]
-
-
-class PointOfContactViewSet(ReadOnlyModelViewSet):
-    queryset = models.ResponsibleModel.objects.filter(is_point_of_contact=True)
-    serializer_class = serializers.ResponsibleSerializer
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ["track"]
 
 
 class StudentViewSet(

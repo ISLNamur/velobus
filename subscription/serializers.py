@@ -14,15 +14,23 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from rest_framework.serializers import ModelSerializer
+from rest_framework.serializers import ModelSerializer, SerializerMethodField
 
 from . import models
 
 
 class TrackSerializer(ModelSerializer):
+    point_of_contact = SerializerMethodField()
+
     class Meta:
         model = models.TrackModel
         fields = "__all__"
+
+    def get_point_of_contact(self, obj):
+        return [
+            f"{resp.last_name} {resp.first_name} – {resp.phone_number}"
+            for resp in obj.point_of_contact.all()
+        ]
 
 
 class StopSerializer(ModelSerializer):

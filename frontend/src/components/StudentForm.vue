@@ -70,7 +70,6 @@ defineExpose({ formData });
 const loading = ref(false);
 const schoolOptions = ref([]);
 const availableDates = ref([]);
-const pointOfContact = ref([]);
 const dates = ref([]);
 const trackForm = ref(null);
 const stopForm = ref(null);
@@ -220,10 +219,6 @@ function reloadPage() {
         });
 }
 
-const getPointOfContact = computed(
-    () => (formData.track ? pointOfContact.value.find((pOC) => pOC.track === formData.track.id) : ""),
-);
-
 const stopsFromTrack = computed(
     () => {
         const stopsWithoutNoMarker = mapStore.stops.filter((s) => !s.no_marker);
@@ -237,11 +232,9 @@ onBeforeMount(() => {
     Promise.all([
         axios.get("/subscription/api/school/"),
         axios.get("/subscription/api/available_date/"),
-        axios.get("/subscription/api/point_of_contact/"),
     ]).then((resps) => {
         schoolOptions.value = resps[0].data;
         availableDates.value = resps[1].data;
-        pointOfContact.value = resps[2].data;
 
         if (props.uuid) {
             axios.get(`/subscription/api/student/${props.uuid}`)
@@ -381,10 +374,18 @@ watch(() => formData.track, (newVal) => {
                                 </strong>
                             </span>
                         </p>
-                        <p v-if="getPointOfContact">
-                            <strong>Référent du tracé</strong>:
-                            {{ getPointOfContact.last_name }} {{ getPointOfContact.first_name }}
-                            ({{ getPointOfContact.phone_number }})
+                        <p v-if="formData.track">
+                            <strong v-if="formData.track.point_of_contact.length > 0">
+                                En cas d'urgence, vous pouvez prendre contact avec vos référents :
+                            </strong>
+                            <br>
+                            <span
+                                v-for="pOC in formData.track.point_of_contact"
+                                :key="pOC"
+                            >
+                                {{ pOC }}
+                                <br>
+                            </span>
                         </p>
                         <q-stepper-navigation>
                             <q-btn

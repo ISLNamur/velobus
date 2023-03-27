@@ -35,6 +35,5 @@ router.register(r"api/responsible", views.ResponsibleViewSet)
 router.register(r"api/responsible_list", views.ResponsibleListView)
 router.register(r"api/student", views.StudentViewSet)
 router.register(r"api/student_list", views.StudentListView)
-router.register(r"api/point_of_contact", views.PointOfContactViewSet)
 
 urlpatterns += router.urls
