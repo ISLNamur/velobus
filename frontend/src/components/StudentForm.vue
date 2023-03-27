@@ -551,6 +551,19 @@ watch(() => formData.track, (newVal) => {
                                 />
                             </div>
                         </div>
+                        <p v-if="formData.track">
+                            <strong v-if="formData.track.point_of_contact.length > 0">
+                                En cas d'urgence, vous pouvez prendre contact avec vos référents :
+                            </strong>
+                            <br>
+                            <span
+                                v-for="pOC in formData.track.point_of_contact"
+                                :key="pOC"
+                            >
+                                {{ pOC }}
+                                <br>
+                            </span>
+                        </p>
                         <q-stepper-navigation>
                             <q-btn
                                 color="primary"
