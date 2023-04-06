@@ -533,9 +533,6 @@ watch(() => formData.track, (newVal) => {
                             href="/static/convention.pdf"
                             target="_blank"
                         />
-                        <b-alert>
-                            Coucou
-                        </b-alert>
                         <q-stepper-navigation>
                             <q-btn
                                 color="positive"
