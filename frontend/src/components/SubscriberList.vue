@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 <script setup>
 import axios from "axios";
-import { ref, onBeforeMount } from "vue";
+import { ref, onBeforeMount, computed } from "vue";
 import { useQuasar } from "quasar";
 import { useMapStore } from "../stores/map";
 
@@ -44,6 +44,10 @@ function loadStudents() {
         dateFilter.value ? `subscription__subscription_date=${dateFilter.value.id}&` : ""
     }${
         trackFilter.value ? `track=${trackFilter.value.id}&` : ""
+    }${
+        stopFilter.value ? `stop=${stopFilter.value.id}&` : ""
+    }${
+        stopFilter.value ? `school=${schoolFilter.value.id}&` : ""
     }`)
         .then((resp) => {
             students.value = resp.data;
@@ -171,11 +175,25 @@ const columns_resp = [
     },
 ];
 
+const stopFilter = ref(null);
+const stopOptions = computed(() => {
+    if (!trackFilter.value) {
+        return mapStore.stops;
+    }
+
+    return mapStore.stops.filter(stop => stop.track === trackFilter.value.id);
+});
+
+const schoolFilter = ref(null);
+const schoolOptions = ref([]);
+
 onBeforeMount(() => {
     Promise.all([
         axios.get("/subscription/api/available_date"),
+        axios.get("/subscription/api/school/"),
     ]).then((resps) => {
         availableDates.value = resps[0].data;
+        schoolOptions.value = resps[1].data;
         loadStudents();
         loadResponsibles();
     });
@@ -212,6 +230,26 @@ onBeforeMount(() => {
                     v-model="trackFilter"
                     label="Filtrer tracé"
                     :options="mapStore.tracks"
+                    option-value="id"
+                    option-label="name"
+                    style="min-width: 160px;margin-left:10px"
+                    clearable
+                    @update:model-value="loadStudents();loadResponsibles()"
+                />
+                <q-select
+                    v-model="stopFilter"
+                    label="Filtrer arrêt"
+                    :options="stopOptions"
+                    option-value="id"
+                    option-label="name"
+                    style="min-width: 160px;margin-left:10px"
+                    clearable
+                    @update:model-value="loadStudents();loadResponsibles()"
+                />
+                <q-select
+                    v-model="schoolFilter"
+                    label="Filtrer école"
+                    :options="schoolOptions"
                     option-value="id"
                     option-label="name"
                     style="min-width: 160px;margin-left:10px"
@@ -299,6 +337,26 @@ onBeforeMount(() => {
                     style="min-width: 160px;margin-left:10px"
                     clearable
                     @update:model-value="loadResponsibles();loadStudents();"
+                />
+                                <q-select
+                    v-model="stopFilter"
+                    label="Filtrer arrêt"
+                    :options="stopOptions"
+                    option-value="id"
+                    option-label="name"
+                    style="min-width: 160px;margin-left:10px"
+                    clearable
+                    @update:model-value="loadStudents();loadResponsibles()"
+                />
+                <q-select
+                    v-model="schoolFilter"
+                    label="Filtrer école"
+                    :options="schoolOptions"
+                    option-value="id"
+                    option-label="name"
+                    style="min-width: 160px;margin-left:10px"
+                    clearable
+                    @update:model-value="loadStudents();loadResponsibles()"
                 />
             </template>
             <template #body-cell-validated="props">
