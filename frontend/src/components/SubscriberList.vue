@@ -47,7 +47,7 @@ function loadStudents() {
     }${
         stopFilter.value ? `stop=${stopFilter.value.id}&` : ""
     }${
-        stopFilter.value ? `school=${schoolFilter.value.id}&` : ""
+        schoolFilter.value ? `school=${schoolFilter.value.id}&` : ""
     }`)
         .then((resp) => {
             students.value = resp.data;
@@ -59,6 +59,10 @@ function loadResponsibles() {
         dateFilter.value ? `subscription__subscription_date=${dateFilter.value.id}&` : ""
     }${
         trackFilter.value ? `track=${trackFilter.value.id}&` : ""
+    }${
+        stopFilter.value ? `stop=${stopFilter.value.id}&` : ""
+    }${
+        schoolFilter.value ? `school=${schoolFilter.value.id}&` : ""
     }`)
         .then((resp) => {
             responsibles.value = resp.data;
