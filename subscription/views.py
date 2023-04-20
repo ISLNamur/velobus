@@ -22,6 +22,7 @@ from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet, GenericV
 from rest_framework import mixins
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.filters import OrderingFilter
 
 from django.core.mail import send_mail
 from django.core.exceptions import ObjectDoesNotExist
@@ -182,8 +183,10 @@ class ResponsibleListView(ReadOnlyModelViewSet):
     queryset = models.ResponsibleModel.objects.all()
     serializer_class = serializers.ResponsibleDepthSerializer
     permission_classes = [IsAuthenticated]
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ["track", "subscription__subscription_date"]
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
+    filterset_fields = ["track", "stop", "school", "subscription__subscription_date"]
+    ordering_fields = ["track", "stop"]
+    ordering = ["track", "stop"]
 
 
 class StudentViewSet(
@@ -205,5 +208,7 @@ class StudentListView(ReadOnlyModelViewSet):
     queryset = models.StudentModel.objects.all()
     serializer_class = serializers.StudentDepthSerializer
     permission_classes = [IsAuthenticated]
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ["track", "subscription__subscription_date"]
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
+    filterset_fields = ["track", "stop", "school", "subscription__subscription_date"]
+    ordering_fields = ["track", "stop"]
+    ordering = ["track", "stop"]
